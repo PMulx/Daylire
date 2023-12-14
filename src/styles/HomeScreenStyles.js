@@ -54,8 +54,31 @@ const styles = StyleSheet.create({
   paragraph: {
     marginTop: 20,
   },
-  apiValues: {
+  apiDiv: {
+    backgroundColor: "#A6ADBE",
+    borderRadius: 20,
+    padding: 20,
     marginTop: 20,
+    marginBottom: 150,
+  },
+  apiTitle: {
+    color: "#101A31",
+    textAlign: "center",
+    fontSize: 20,
+  },
+  apiText: {
+    color: "#101A31",
+    fontSize: 20,
+  },
+  btnApi: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 10,
+    borderRadius: 20,
+    backgroundColor: "#D9D9D9",
+    marginBottom: 10,
+    marginTop: 10,
   },
 });
 

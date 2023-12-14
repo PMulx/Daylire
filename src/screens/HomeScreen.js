@@ -28,14 +28,12 @@ const HomeScreen = () => {
     }
   };
 
-  // Appel de la fonction au chargement du composant
   useEffect(() => {
     fetchDataFromApi();
   }, []);
 
   return (
     <ScrollView style={styles.home}>
-      {/* Header avec logo et icône de question */}
       <View style={styles.header}>
         <Image source={require("../../assets/logo.png")} style={styles.logo} />
         <TouchableOpacity onPress={() => alert("Icône de question cliquée")}>
@@ -46,9 +44,7 @@ const HomeScreen = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Contenu de la page */}
       <View style={styles.container}>
-        {/* Première div avec un paragraphe et un bouton */}
         <View>
           <Text style={styles.text}>
             Daylire propose des lectures délirantes de cadavres exquis de
@@ -71,7 +67,6 @@ const HomeScreen = () => {
           </TouchableOpacity>
         </View>
 
-        {/* Deuxième div avec un paragraphe */}
         <View style={styles.paragraph}>
           <Text style={styles.text}>
             Le cadavre exquis, c'est une création littéraire collaborative où
@@ -81,12 +76,33 @@ const HomeScreen = () => {
           </Text>
         </View>
 
-        {/* Troisième div avec les valeurs de l'API */}
         {apiData && (
-          <View style={styles.apiValues}>
-            <Text>Valeur 1: {apiData.t}</Text>
-            <Text>Valeur 2: {apiData.value2}</Text>
-            {/* Ajoutez d'autres champs en conséquence */}
+          <View style={styles.apiDiv}>
+            <Text style={styles.apiTitle}> 3 derniers cadavres exquis </Text>
+            <TouchableOpacity style={styles.btnApi}>
+              <Text style={styles.apiText}> 1 </Text>
+              <Text style={styles.apiText}>Nom cadavre: {apiData.t}</Text>
+              <Image
+                source={require("../../assets/play.png")}
+                style={styles.playLogo}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.btnApi}>
+              <Text style={styles.apiText}> 2 </Text>
+              <Text style={styles.apiText}>Nom cadavre: {apiData.value2}</Text>
+              <Image
+                source={require("../../assets/play.png")}
+                style={styles.playLogo}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.btnApi}>
+              <Text style={styles.apiText}> 3 </Text>
+              <Text style={styles.apiText}>Nom cadavre: {apiData.value3}</Text>
+              <Image
+                source={require("../../assets/play.png")}
+                style={styles.playLogo}
+              />
+            </TouchableOpacity>
           </View>
         )}
       </View>

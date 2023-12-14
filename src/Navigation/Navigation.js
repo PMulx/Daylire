@@ -90,7 +90,10 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
 const AppNavigator = () => {
   return (
     <NavigationContainer>
-      <Tab.Navigator tabBar={(props) => <CustomTabBar {...props} />}>
+      <Tab.Navigator
+        initialRouteName="Home"
+        tabBar={(props) => <CustomTabBar {...props} />}
+      >
         <Tab.Screen name="List" component={ListScreen} />
         <Tab.Screen name="Home" component={HomeScreen} />
         <Tab.Screen name="Like" component={LikeScreen} />
