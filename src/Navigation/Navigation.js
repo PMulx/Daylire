@@ -73,7 +73,15 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
         };
 
         return (
-          <View key={route.key} style={{ flex: 1, alignItems: "center" }}>
+          <View
+            key={route.key}
+            style={{
+              flex: 1,
+              alignItems: "center",
+              backgroundColor: isFocused ? "#A4FA82" : "transparent", // Fond vert si l'onglet est sélectionné, sinon transparent
+              borderRadius: 350, // Bordure arrondie pour l'onglet sélectionné
+            }}
+          >
             <TouchableOpacity
               onPress={onPress}
               style={{ flexDirection: "row", alignItems: "center" }}
