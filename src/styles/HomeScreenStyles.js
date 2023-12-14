@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native";
 const styles = StyleSheet.create({
   home: {
     backgroundColor: "#101A31",
-    padding: 20,
+    padding: 30,
   },
   btn: {
     alignSelf: "center",
@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginLeft: "20%",
+    marginLeft: "15%",
     padding: 10,
   },
   logo: {
