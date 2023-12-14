@@ -94,9 +94,21 @@ const AppNavigator = () => {
         initialRouteName="Home"
         tabBar={(props) => <CustomTabBar {...props} />}
       >
-        <Tab.Screen name="List" component={ListScreen} />
-        <Tab.Screen name="Home" component={HomeScreen} />
-        <Tab.Screen name="Like" component={LikeScreen} />
+        <Tab.Screen
+          name="List"
+          component={ListScreen}
+          options={{ headerShown: false }}
+        />
+        <Tab.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{ headerShown: false }}
+        />
+        <Tab.Screen
+          name="Like"
+          component={LikeScreen}
+          options={{ headerShown: false }}
+        />
       </Tab.Navigator>
     </NavigationContainer>
   );
