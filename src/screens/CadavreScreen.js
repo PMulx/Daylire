@@ -39,9 +39,15 @@ const CadavreScreen = ({ route }) => {
 
   const handleLike = async () => {
     try {
-      const response = await fetch(
-        "https://loufok.alwaysdata.net/api/cadavre/" + id_cadavre
-      );
+      const likeEndpoint = isLiked
+        ? "https://loufok.alwaysdata.net/api/cadavre/" +
+          id_cadavre +
+          "/remove_like"
+        : "https://loufok.alwaysdata.net/api/cadavre/" +
+          id_cadavre +
+          "/add_like";
+
+      const response = await fetch(likeEndpoint);
       const data = await response.json();
 
       const updatedData = {
@@ -49,9 +55,10 @@ const CadavreScreen = ({ route }) => {
         nb_jaime: isLiked ? data.nb_jaime - 1 : data.nb_jaime + 1,
       };
 
-      AsyncStorage.setItem(
+      // Mettez à jour AsyncStorage de manière appropriée
+      await AsyncStorage.setItem(
         "likedCadavre" + updatedData.id_cadavre,
-        isLiked ? "false" : "true"
+        String(!isLiked) // Basculez la valeur
       );
 
       setApiData(updatedData);
