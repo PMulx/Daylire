@@ -11,7 +11,6 @@ import {
 } from "react-native";
 import { SearchBar } from "react-native-elements";
 import styles from "./../styles/LikeScreenStyles";
-import { SvgUri } from "react-native-svg";
 
 const LikeScreen = () => {
   const [apiData, setApiData] = useState(null);
@@ -50,10 +49,45 @@ const LikeScreen = () => {
   const closeModal = () => {
     setModalVisible(false);
   };
+  // const likeCadavre = (cadavreId) => {
+  //   // Logique pour liker le cadavre avec l'ID cadavreId
+  //   console.log(`Liked Cadavre with ID: ${cadavreId}`);
+  // };
+  // const readCadavre = (cadavreId) => {
+  //   // Logique pour lire le cadavre avec l'ID cadavreId
+  //   console.log(`Read Cadavre with ID: ${cadavreId}`);
+  // };
   const handleSortChange = (itemValue) => {
     setSelectedSort(itemValue);
     // Ajoutez ici la logique pour trier votre contenu en fonction de la valeur sélectionnée
   };
+
+  // const renderCadavres = () => {
+  //   if (!apiData || apiData.length === 0) {
+  //     return <Text>Aucun cadavre trouvé.</Text>;
+  //   }
+
+  //   return apiData.map((cadavre) => (
+  //     <View key={cadavre.id} style={styles.cadavreContainer}>
+  //       <Text style={styles.cadavreName}>{cadavre.name}</Text>
+  //       <Text style={styles.cadavreDate}>
+  //         Début: {cadavre.startDate} - Fin: {cadavre.endDate}
+  //       </Text>
+  //       <TouchableOpacity
+  //         style={styles.cadavreButton}
+  //         onPress={() => likeCadavre(cadavre.id)}
+  //       >
+  //         <Text style={styles.cadavreButtonText}>Like</Text>
+  //       </TouchableOpacity>
+  //       <TouchableOpacity
+  //         style={styles.cadavreButton}
+  //         onPress={() => readCadavre(cadavre.id)}
+  //       >
+  //         <Text style={styles.cadavreButtonText}>Read</Text>
+  //       </TouchableOpacity>
+  //     </View>
+  //   ));
+  // };
 
   return (
     <ScrollView style={styles.home}>
@@ -87,6 +121,27 @@ const LikeScreen = () => {
           />
         </TouchableOpacity>
       </View>
+      <View style={styles.cadavreContainer}>
+        <View style={styles.cadavreContainerLeft}>
+          <Text style={styles.cadavreName}>TEST </Text>
+          <Text style={styles.cadavreDate}>7/12/2023 - 14/12/2023</Text>
+        </View>
+
+        <View style={styles.cadavreContainerRight}>
+          <TouchableOpacity
+            style={styles.cadavreButton}
+            // onPress={() => likeCadavre(cadavre.id)}
+          >
+            <Text style={styles.cadavreButtonText}>Like</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.cadavreButton}
+            // onPress={() => readCadavre(cadavre.id)}
+          >
+            <Text style={styles.cadavreButtonText}>Lire</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
       <Modal
         animationType="slide"
         transparent={true}
@@ -101,7 +156,6 @@ const LikeScreen = () => {
               selectedValue={selectedSort}
               onValueChange={(itemValue) => handleSortChange(itemValue)}
               style={{ color: "black" }}
-              itemStyle={{ color: "red" }}
             >
               <Picker.Item label="Alphabétique A-Z" value="alphabetical" />
               <Picker.Item label="Alphabétique Z-A" value="Zalphabetical" />
@@ -115,6 +169,7 @@ const LikeScreen = () => {
               <Text style={styles.closeModalButtonText}>Fermer</Text>
             </TouchableOpacity>
           </View>
+          <View></View>
         </View>
       </Modal>
     </ScrollView>

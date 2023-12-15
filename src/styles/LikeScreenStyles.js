@@ -106,6 +106,24 @@ const styles = StyleSheet.create({
   itemFilter: {
     color: "black",
   },
+  cadavreContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 15,
+    padding: 15,
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexDirection: "row",
+    marginTop: 15,
+  },
+  cadavreContainerLeft: {
+    flexDirection: "column",
+    gap: 8,
+  },
+  cadavreContainerRight: {
+    flexDirection: "row",
+    gap: 20,
+    marginRight: 10,
+  },
 });
 
 export default styles;
