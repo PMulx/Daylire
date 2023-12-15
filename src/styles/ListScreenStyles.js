@@ -75,6 +75,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     flexDirection: "row",
+    marginBottom: 20,
   },
   modalContainer: {
     flex: 1,
@@ -107,15 +108,17 @@ const styles = StyleSheet.create({
     color: "black",
   },
   apiDiv: {
+    marginVertical: 15,
     flexDirection: "row",
-    gap: 40,
+    justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#A6ADBE",
+    backgroundColor: "#FEFFFE",
     borderRadius: 20,
     padding: 10,
+    paddingHorizontal: 20,
   },
   apiInfo: {
-    paddingLeft: 15,
+    flexDirection: "column",
   },
   apiInfoTitle: {
     color: "#101A31",
@@ -124,12 +127,20 @@ const styles = StyleSheet.create({
   },
   apiInfoPeriode: {
     color: "#101A31",
-    fontSize: 18,
+    fontSize: 16,
   },
   apiInfoParticipants: {
     color: "#101A31",
     fontSize: 15,
     fontWeight: "300",
+  },
+  titleText: {
+    fontWeight: "bold",
+    fontSize: 18,
+  },
+  participantsText: {
+    fontStyle: "italic",
+    fontSize: 14,
   },
   apiText: {
     color: "#101A31",
@@ -142,7 +153,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 10,
     borderRadius: 20,
-    backgroundColor: "#EEEFF2",
     marginBottom: 10,
     marginTop: 10,
   },

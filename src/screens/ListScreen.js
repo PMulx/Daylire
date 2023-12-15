@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Picker } from "@react-native-picker/picker";
 import { Svg, Circle, Text as SvgText } from "react-native-svg";
+import { useNavigation } from "@react-navigation/native";
 import {
   View,
   Image,
@@ -55,6 +56,7 @@ const PercentageCircleChart = ({ percentage }) => {
 };
 
 const LikeScreen = () => {
+  const navigation = useNavigation();
   const [apiData, setApiData] = useState(null);
   const [search, setSearch] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
@@ -67,7 +69,6 @@ const LikeScreen = () => {
       );
       const data = await response.json();
       setApiData(data);
-      console.log(data);
     } catch (error) {
       console.error(
         "Erreur lors de la récupération des données de l'API",
@@ -79,6 +80,12 @@ const LikeScreen = () => {
   useEffect(() => {
     fetchDataFromApi();
   }, []);
+
+  const formatDate = (dateString) => {
+    const options = { year: "numeric", month: "numeric", day: "numeric" };
+    const date = new Date(dateString);
+    return date.toLocaleDateString("fr-FR", options);
+  };
 
   const updateSearch = (text) => {
     setSearch(text);
@@ -157,57 +164,43 @@ const LikeScreen = () => {
           </View>
         </View>
       </Modal>
-      <TouchableOpacity style={styles.btnApi}>
-        <Text style={styles.apiText}> 1 </Text>
-        <View style={styles.apiDiv}>
-          <View style={styles.apiInfo}>
-            <Text style={styles.apiInfoTitle}>Nom cadavre</Text>
-            <Text style={styles.apiInfoPeriode}>Période cadavre</Text>
-            <Text style={styles.apiInfoParticipants}>NbParticipants</Text>
+      {apiData &&
+        apiData.map((data, index) => (
+          <View key={index} style={styles.apiDiv}>
+            <View style={styles.apiInfo}>
+              <Text style={styles.apiInfoTitle}>
+                <Text style={styles.titleText}>{data.titre_cadavre}</Text> -{" "}
+                <Text style={styles.participantsText}>
+                  {data.nb_contributions} participants
+                </Text>
+              </Text>
+              <Text style={styles.apiInfoPeriode}>
+                {formatDate(data.date_debut_cadavre)} -{" "}
+                {formatDate(data.date_fin_cadavre)}
+              </Text>
+            </View>
+            <View style={styles.percentageCircleContainer}>
+              <PercentageCircleChart
+                percentage={Math.round(
+                  (data.nb_contributions / data.nb_contributions_max) * 100
+                )}
+              />
+            </View>
+            <TouchableOpacity
+              style={styles.btnApi}
+              onPress={() => {
+                navigation.navigate("Cadavre", {
+                  id_cadavre: data.id_cadavre,
+                });
+              }}
+            >
+              <Image
+                source={require("../../assets/play.png")}
+                style={styles.playLogo}
+              />
+            </TouchableOpacity>
           </View>
-          <View style={styles.percentageCircleContainer}>
-            <PercentageCircleChart percentage={75} />
-          </View>
-          <Image
-            source={require("../../assets/play__green.png")}
-            style={styles.playLogo}
-          />
-        </View>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.btnApi}>
-        <Text style={styles.apiText}> 2 </Text>
-        <View style={styles.apiDiv}>
-          <View style={styles.apiInfo}>
-            <Text style={styles.apiInfoTitle}>Nom cadavre</Text>
-            <Text style={styles.apiInfoPeriode}>Période cadavre</Text>
-            <Text style={styles.apiInfoParticipants}>NbParticipants</Text>
-          </View>
-          <View style={styles.percentageCircleContainer}>
-            <PercentageCircleChart percentage={56} />
-          </View>
-          <Image
-            source={require("../../assets/play__green.png")}
-            style={styles.playLogo}
-          />
-        </View>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.btnApi}>
-        <Text style={styles.apiText}> 3 </Text>
-        <View style={styles.apiDiv}>
-          <View style={styles.apiInfo}>
-            <Text style={styles.apiInfoTitle}>Nom cadavre</Text>
-            <Text style={styles.apiInfoPeriode}>Période cadavre</Text>
-            <Text style={styles.apiInfoParticipants}>NbParticipants</Text>
-          </View>
-          <View style={styles.percentageCircleContainer}>
-            <PercentageCircleChart percentage={23} />
-          </View>
-          <Image
-            source={require("../../assets/play__green.png")}
-            style={styles.playLogo}
-          />
-        </View>
-      </TouchableOpacity>
+        ))}
     </ScrollView>
   );
 };

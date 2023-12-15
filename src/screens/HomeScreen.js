@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigation } from "@react-navigation/native";
 import {
   View,
   Text,
@@ -10,6 +11,7 @@ import {
 import styles from "../styles/HomeScreenStyles";
 
 const HomeScreen = () => {
+  const navigation = useNavigation();
   const [apiData, setApiData] = useState(null);
 
   const fetchDataFromApi = async () => {
@@ -19,7 +21,6 @@ const HomeScreen = () => {
       );
       const data = await response.json();
       setApiData(data);
-      console.log(data);
     } catch (error) {
       console.error(
         "Erreur lors de la récupération des données de l'API",
@@ -79,30 +80,29 @@ const HomeScreen = () => {
         {apiData && (
           <View style={styles.apiDiv}>
             <Text style={styles.apiTitle}> 3 derniers cadavres exquis </Text>
-            <TouchableOpacity style={styles.btnApi}>
-              <Text style={styles.apiText}> 1 </Text>
-              <Text style={styles.apiText}>Nom cadavre: {apiData.t}</Text>
-              <Image
-                source={require("../../assets/play.png")}
-                style={styles.playLogo}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.btnApi}>
-              <Text style={styles.apiText}> 2 </Text>
-              <Text style={styles.apiText}>Nom cadavre: {apiData.value2}</Text>
-              <Image
-                source={require("../../assets/play.png")}
-                style={styles.playLogo}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.btnApi}>
-              <Text style={styles.apiText}> 3 </Text>
-              <Text style={styles.apiText}>Nom cadavre: {apiData.value3}</Text>
-              <Image
-                source={require("../../assets/play.png")}
-                style={styles.playLogo}
-              />
-            </TouchableOpacity>
+            {apiData
+              .sort(
+                (a, b) =>
+                  new Date(b.date_fin_cadavre) - new Date(a.date_fin_cadavre)
+              )
+              .slice(0, 3) // Sélectionne les trois derniers
+              .map((cadavre, index) => (
+                <View key={index} style={styles.btnApi}>
+                  <Text style={styles.apiText}>{cadavre.titre_cadavre}</Text>
+                  <TouchableOpacity
+                    onPress={() => {
+                      navigation.navigate("Cadavre", {
+                        id_cadavre: cadavre.id_cadavre,
+                      });
+                    }}
+                  >
+                    <Image
+                      source={require("../../assets/play.png")}
+                      style={styles.playLogo}
+                    />
+                  </TouchableOpacity>
+                </View>
+              ))}
           </View>
         )}
       </View>

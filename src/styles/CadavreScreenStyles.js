@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native";
 const styles = StyleSheet.create({
   home: {
     backgroundColor: "#101A31",
-    padding: 30,
+    padding: 20,
   },
   btn: {
     alignSelf: "center",
@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginLeft: "15%",
+    marginLeft: "20%",
     padding: 10,
   },
   logo: {
@@ -51,35 +51,31 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
   },
-  paragraph: {
-    marginTop: 20,
-  },
-  apiDiv: {
-    padding: 20,
-    marginTop: 20,
-    marginBottom: 150,
-  },
-  apiTitle: {
-    color: "#FEFFFE",
-    marginBottom: 20,
+  title: {
+    marginTop: 15,
     textAlign: "center",
-    fontSize: 20,
+    fontWeight: "bold",
+    fontSize: 25,
+    color: "#FEFFFE",
+    marginBottom: 45,
   },
-  apiText: {
-    color: "#101A31",
-    fontSize: 20,
+  likeLogo: {
+    position: "absolute",
+    top: -75,
+    right: 20,
   },
-  btnApi: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 25,
-    padding: 13,
-    borderRadius: 20,
-    backgroundColor: "#FEFFFE",
-    marginBottom: 13,
-    marginTop: 13,
+  plumeText: {
+    letterSpacing: 2,
+    marginTop: 30,
+    fontStyle: "italic",
+    textAlign: "justify",
+    color: "#FEFFFE",
+    marginBottom: 140,
+  },
+  contributionText: {
+    textAlign: "justify",
+    color: "#FEFFFE",
+    fontSize: 15,
   },
 });
-
 export default styles;

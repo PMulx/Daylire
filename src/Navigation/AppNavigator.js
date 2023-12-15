@@ -5,6 +5,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomeScreen from "../screens/HomeScreen";
 import LikeScreen from "../screens/LikeScreen";
 import ListScreen from "../screens/ListScreen";
+import CadavreScreen from "../screens/CadavreScreen";
 import { View, Image } from "react-native";
 
 const Tab = createBottomTabNavigator();
@@ -34,6 +35,7 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
             : route.name;
 
         const isFocused = state.index === index;
+        const isCadavreScreen = route.name === "Cadavre";
 
         const onPress = () => {
           const event = navigation.emit({
@@ -76,10 +78,10 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
           <View
             key={route.key}
             style={{
-              flex: 1,
+              flex: isCadavreScreen ? 0 : 1, // Ajuster le nombre d'éléments par ligne pour Cadavre
               alignItems: "center",
-              backgroundColor: isFocused ? "#A4FA82" : "transparent", // Fond vert si l'onglet est sélectionné, sinon transparent
-              borderRadius: 350, // Bordure arrondie pour l'onglet sélectionné
+              backgroundColor: isFocused ? "#A4FA82" : "transparent",
+              borderRadius: 350,
             }}
           >
             <TouchableOpacity
@@ -116,6 +118,14 @@ const AppNavigator = () => {
           name="Like"
           component={LikeScreen}
           options={{ headerShown: false }}
+        />
+        <Tab.Screen
+          name="Cadavre"
+          component={CadavreScreen}
+          options={{
+            headerShown: false,
+            tabBarStyle: { display: "none" }, // Cacher le style de la barre d'onglets
+          }}
         />
       </Tab.Navigator>
     </NavigationContainer>
