@@ -61,6 +61,8 @@ const ListScreen = () => {
   const [search, setSearch] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedSort, setSelectedSort] = useState("alphabetical");
+  const [filteredCadavres, setFilteredCadavres] = useState(null);
+  const [sortedCadavres, setSortedCadavres] = useState(null);
 
   const fetchDataFromApi = async () => {
     try {
@@ -89,7 +91,14 @@ const ListScreen = () => {
 
   const updateSearch = (text) => {
     setSearch(text);
-    // Vous pouvez également effectuer d'autres opérations ici, si nécessaire
+    if (text.trim() === "") {
+      setFilteredCadavres(apiData);
+    } else {
+      const filtered = apiData.filter((cadavre) =>
+        cadavre.titre_cadavre.toLowerCase().includes(text.toLowerCase())
+      );
+      setFilteredCadavres(filtered);
+    }
   };
   const openModal = () => {
     setModalVisible(true);
@@ -98,9 +107,40 @@ const ListScreen = () => {
   const closeModal = () => {
     setModalVisible(false);
   };
+  const sortCadavres = (cadavres, sortOption) => {
+    if (sortOption === "alphabetical") {
+      return cadavres
+        .slice()
+        .sort((a, b) => a.titre_cadavre.localeCompare(b.titre_cadavre));
+    } else if (sortOption === "date") {
+      return cadavres
+        .slice()
+        .sort(
+          (a, b) =>
+            new Date(b.date_debut_cadavre) - new Date(a.date_debut_cadavre)
+        );
+    }
+    return cadavres;
+  };
+
   const handleSortChange = (itemValue) => {
     setSelectedSort(itemValue);
-    // Ajoutez ici la logique pour trier votre contenu en fonction de la valeur sélectionnée
+
+    let sortedData;
+
+    if (itemValue === "alphabetical") {
+      // Tri alphabétique en fonction du titre du cadavre
+      sortedData = apiData.sort((a, b) =>
+        a.titre_cadavre.localeCompare(b.titre_cadavre)
+      );
+    } else if (itemValue === "date") {
+      // Tri par la date de fin du cadavre
+      sortedData = apiData.sort(
+        (a, b) => new Date(a.date_fin_cadavre) - new Date(b.date_fin_cadavre)
+      );
+    }
+
+    setSortedCadavres(sortedData);
   };
 
   return (
@@ -162,43 +202,42 @@ const ListScreen = () => {
           </View>
         </View>
       </Modal>
-      {apiData &&
-        apiData.map((data, index) => (
-          <View key={index} style={styles.apiDiv}>
-            <View style={styles.apiInfo}>
-              <Text style={styles.apiInfoTitle}>
-                <Text style={styles.titleText}>{data.titre_cadavre}</Text> -{" "}
-                <Text style={styles.participantsText}>
-                  {data.nb_contributions} participants
-                </Text>
+      {(filteredCadavres || apiData || []).map((data, index) => (
+        <View key={index} style={styles.apiDiv}>
+          <View style={styles.apiInfo}>
+            <Text style={styles.apiInfoTitle}>
+              <Text style={styles.titleText}>{data.titre_cadavre}</Text> -{" "}
+              <Text style={styles.participantsText}>
+                {data.nb_contributions} participants
               </Text>
-              <Text style={styles.apiInfoPeriode}>
-                {formatDate(data.date_debut_cadavre)} -{" "}
-                {formatDate(data.date_fin_cadavre)}
-              </Text>
-            </View>
-            <View style={styles.percentageCircleContainer}>
-              <PercentageCircleChart
-                percentage={Math.round(
-                  (data.nb_contributions / data.nb_contributions_max) * 100
-                )}
-              />
-            </View>
-            <TouchableOpacity
-              style={styles.btnApi}
-              onPress={() => {
-                navigation.navigate("Cadavre", {
-                  id_cadavre: data.id_cadavre,
-                });
-              }}
-            >
-              <Image
-                source={require("../../assets/play.png")}
-                style={styles.playLogo}
-              />
-            </TouchableOpacity>
+            </Text>
+            <Text style={styles.apiInfoPeriode}>
+              {formatDate(data.date_debut_cadavre)} -{" "}
+              {formatDate(data.date_fin_cadavre)}
+            </Text>
           </View>
-        ))}
+          <View style={styles.percentageCircleContainer}>
+            <PercentageCircleChart
+              percentage={Math.round(
+                (data.nb_contributions / data.nb_contributions_max) * 100
+              )}
+            />
+          </View>
+          <TouchableOpacity
+            style={styles.btnApi}
+            onPress={() => {
+              navigation.navigate("Cadavre", {
+                id_cadavre: data.id_cadavre,
+              });
+            }}
+          >
+            <Image
+              source={require("../../assets/play.png")}
+              style={styles.playLogo}
+            />
+          </TouchableOpacity>
+        </View>
+      ))}
     </ScrollView>
   );
 };
