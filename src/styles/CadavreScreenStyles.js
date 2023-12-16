@@ -1,40 +1,22 @@
 import { StyleSheet } from "react-native";
 
+const primaryColor = "#101A31";
+const secondaryColor = "#A4FA82";
+const textColor = "#FEFFFE";
+
 const styles = StyleSheet.create({
+  // Global styles
   home: {
-    backgroundColor: "#101A31",
+    backgroundColor: primaryColor,
     padding: 20,
-  },
-  btn: {
-    alignSelf: "center",
-    marginTop: 30,
-    marginBottom: 20,
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-    backgroundColor: "#A4FA82",
-    color: "#101A31",
-    padding: 10,
-    borderRadius: 20,
-    width: "70%",
-  },
-  textLoufok: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  loufokLogo: {
-    width: 35,
-    height: 35,
-  },
-  playLogo: {
-    width: 25,
-    height: 25,
   },
   text: {
     fontSize: 18,
-    color: "#FEFFFE",
+    color: textColor,
     textAlign: "justify",
   },
+
+  // Header styles
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -51,31 +33,75 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
   },
+
+  // Button styles
+  btn: {
+    alignSelf: "center",
+    marginTop: 30,
+    marginBottom: 20,
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    backgroundColor: secondaryColor,
+    color: primaryColor,
+    padding: 10,
+    borderRadius: 20,
+    width: "70%",
+  },
+  textLoufok: {
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+  loufokLogo: {
+    width: 35,
+    height: 35,
+  },
+
+  // Title styles
   title: {
-    marginTop: 15,
     textAlign: "center",
     fontWeight: "bold",
     fontSize: 25,
-    color: "#FEFFFE",
+    color: textColor,
+    alignSelf: "center",
+  },
+
+  // Top Bar styles
+  topBar: {
+    margin: 15,
     marginBottom: 45,
+    position: "relative",
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    gap: 30,
   },
-  likeLogo: {
-    position: "absolute",
-    top: -75,
-    right: 20,
+
+  // Contribution styles
+  contributionText: {
+    textAlign: "justify",
+    color: textColor,
+    fontSize: 15,
   },
+
+  // Plume text styles
   plumeText: {
     letterSpacing: 2,
     marginTop: 30,
     fontStyle: "italic",
     textAlign: "justify",
-    color: "#FEFFFE",
+    color: textColor,
     marginBottom: 140,
   },
-  contributionText: {
-    textAlign: "justify",
-    color: "#FEFFFE",
-    fontSize: 15,
+
+  // Like section styles
+  likeSection: {
+    position: "relative",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 8,
   },
 });
+
 export default styles;

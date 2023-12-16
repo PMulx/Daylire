@@ -11,6 +11,7 @@ import { Picker } from "@react-native-picker/picker";
 import { SearchBar } from "react-native-elements";
 import styles from "./../styles/LikeScreenStyles";
 import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const LikeScreen = () => {
   const navigation = useNavigation();
@@ -18,7 +19,6 @@ const LikeScreen = () => {
   const [search, setSearch] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedSort, setSelectedSort] = useState("alphabetical");
-  const [isLiked, setIsLiked] = useState(false);
   const [filteredCadavres, setFilteredCadavres] = useState(null);
   const [sortedCadavres, setSortedCadavres] = useState(null);
 
@@ -29,8 +29,18 @@ const LikeScreen = () => {
       );
       const data = await response.json();
 
+      // Mettez à jour les données avec l'état de like
+      const updatedData = await Promise.all(
+        data.map(async (cadavre) => {
+          const likedStatus = await AsyncStorage.getItem(
+            "likedCadavre" + cadavre.id_cadavre
+          );
+          return { ...cadavre, isLiked: likedStatus === "true" };
+        })
+      );
+
       // Tri alphabétique initial en fonction du titre du cadavre
-      const sortedData = data.sort((a, b) =>
+      const sortedData = updatedData.sort((a, b) =>
         a.titre_cadavre.localeCompare(b.titre_cadavre)
       );
 
@@ -90,9 +100,50 @@ const LikeScreen = () => {
     setSortedCadavres(sortedData);
   };
 
-  const likeCadavre = (cadavreId) => {
-    // Logique pour liker le cadavre avec l'ID cadavreId
-    console.log(`Liked Cadavre with ID: ${cadavreId}`);
+  const [likedCadavres, setLikedCadavres] = useState([]);
+
+  const updateCadavreIsLiked = (cadavreId, isLiked) => {
+    // Mettez à jour l'état local
+    const updatedLikedCadavres = isLiked
+      ? [...likedCadavres, cadavreId]
+      : likedCadavres.filter((id) => id !== cadavreId);
+    setLikedCadavres(updatedLikedCadavres);
+
+    // Mettez à jour la propriété isLiked dans le tableau apiData
+    setApiData((prevApiData) =>
+      prevApiData.map((cadavre) =>
+        cadavre.id_cadavre === cadavreId ? { ...cadavre, isLiked } : cadavre
+      )
+    );
+  };
+
+  const likeCadavre = async (cadavreId) => {
+    // Appel à l'API pour liker ou ne pas liker le cadavre
+    try {
+      const likeEndpoint = isLiked
+        ? `https://loufok.alwaysdata.net/api/cadavre/${cadavreId}/remove_like`
+        : `https://loufok.alwaysdata.net/api/cadavre/${cadavreId}/add_like`;
+
+      const response = await fetch(likeEndpoint);
+      const data = await response.json();
+
+      const updatedData = {
+        ...data,
+        nb_jaime: isLiked ? data.nb_jaime - 1 : data.nb_jaime + 1,
+      };
+
+      await AsyncStorage.setItem(
+        "likedCadavre" + updatedData.id_cadavre,
+        String(!isLiked)
+      );
+
+      updateCadavreIsLiked(cadavreId, !isLiked);
+    } catch (error) {
+      console.error(
+        "Erreur lors de la récupération ou de la mise à jour des données de l'API",
+        error
+      );
+    }
   };
 
   const formatDate = (dateString) => {
@@ -102,13 +153,16 @@ const LikeScreen = () => {
   };
 
   const renderCadavres = () => {
-    const cadavresToRender = filteredCadavres || sortedCadavres || apiData;
+    const cadavresToRender = (
+      (filteredCadavres || sortedCadavres || apiData) ??
+      []
+    ).filter((cadavre) => likedCadavres.includes(cadavre.id_cadavre));
 
     if (!cadavresToRender || cadavresToRender.length === 0) {
-      return <Text style={{ color: "white" }}>Aucun cadavre trouvé.</Text>;
+      return <Text style={{ color: "white" }}>Aucun cadavre aimé trouvé.</Text>;
     }
 
-    return apiData.map((cadavre) => (
+    return cadavresToRender.map((cadavre) => (
       <View key={cadavre.id_cadavre} style={styles.cadavreContainer}>
         <View style={styles.cadavreContainerLeft}>
           <Text style={styles.titleText}>{cadavre.titre_cadavre}</Text>
@@ -123,7 +177,11 @@ const LikeScreen = () => {
             onPress={() => likeCadavre(cadavre.id_cadavre)}
           >
             <Image
-              source={require("../../assets/love.png")}
+              source={
+                cadavre.isLiked
+                  ? require("../../assets/love.png")
+                  : require("../../assets/no_love.png")
+              }
               style={styles.likeLogo}
             />
           </TouchableOpacity>
