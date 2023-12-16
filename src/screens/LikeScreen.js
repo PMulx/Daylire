@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Picker } from "@react-native-picker/picker";
 import {
   View,
   Image,
@@ -7,16 +6,21 @@ import {
   ScrollView,
   Modal,
   Text,
-  Button,
 } from "react-native";
+import { Picker } from "@react-native-picker/picker";
 import { SearchBar } from "react-native-elements";
 import styles from "./../styles/LikeScreenStyles";
+import { useNavigation } from "@react-navigation/native";
 
 const LikeScreen = () => {
+  const navigation = useNavigation();
   const [apiData, setApiData] = useState(null);
   const [search, setSearch] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedSort, setSelectedSort] = useState("alphabetical");
+  const [isLiked, setIsLiked] = useState(false);
+  const [filteredCadavres, setFilteredCadavres] = useState(null);
+  const [sortedCadavres, setSortedCadavres] = useState(null);
 
   const fetchDataFromApi = async () => {
     try {
@@ -24,8 +28,14 @@ const LikeScreen = () => {
         "https://loufok.alwaysdata.net/api/cadavres"
       );
       const data = await response.json();
-      setApiData(data);
-      console.log(data);
+
+      // Tri alphabétique initial en fonction du titre du cadavre
+      const sortedData = data.sort((a, b) =>
+        a.titre_cadavre.localeCompare(b.titre_cadavre)
+      );
+
+      setApiData(sortedData);
+      setSortedCadavres(sortedData); // Enregistrez l'état initial trié
     } catch (error) {
       console.error(
         "Erreur lors de la récupération des données de l'API",
@@ -40,8 +50,18 @@ const LikeScreen = () => {
 
   const updateSearch = (text) => {
     setSearch(text);
-    // Vous pouvez également effectuer d'autres opérations ici, si nécessaire
+    if (text.trim() === "") {
+      // Si le champ de recherche est vide, affichez tous les cadavres
+      setFilteredCadavres(apiData);
+    } else {
+      // Filtrer les cadavres en fonction du titre
+      const filtered = apiData.filter((cadavre) =>
+        cadavre.titre_cadavre.toLowerCase().includes(text.toLowerCase())
+      );
+      setFilteredCadavres(filtered);
+    }
   };
+
   const openModal = () => {
     setModalVisible(true);
   };
@@ -49,45 +69,81 @@ const LikeScreen = () => {
   const closeModal = () => {
     setModalVisible(false);
   };
-  // const likeCadavre = (cadavreId) => {
-  //   // Logique pour liker le cadavre avec l'ID cadavreId
-  //   console.log(`Liked Cadavre with ID: ${cadavreId}`);
-  // };
-  // const readCadavre = (cadavreId) => {
-  //   // Logique pour lire le cadavre avec l'ID cadavreId
-  //   console.log(`Read Cadavre with ID: ${cadavreId}`);
-  // };
+
   const handleSortChange = (itemValue) => {
     setSelectedSort(itemValue);
-    // Ajoutez ici la logique pour trier votre contenu en fonction de la valeur sélectionnée
+
+    let sortedData;
+
+    if (itemValue === "alphabetical") {
+      // Tri alphabétique en fonction du titre du cadavre
+      sortedData = apiData.sort((a, b) =>
+        a.titre_cadavre.localeCompare(b.titre_cadavre)
+      );
+    } else if (itemValue === "date") {
+      // Tri par la date de fin du cadavre
+      sortedData = apiData.sort(
+        (a, b) => new Date(a.date_fin_cadavre) - new Date(b.date_fin_cadavre)
+      );
+    }
+
+    setSortedCadavres(sortedData);
   };
 
-  // const renderCadavres = () => {
-  //   if (!apiData || apiData.length === 0) {
-  //     return <Text>Aucun cadavre trouvé.</Text>;
-  //   }
+  const likeCadavre = (cadavreId) => {
+    // Logique pour liker le cadavre avec l'ID cadavreId
+    console.log(`Liked Cadavre with ID: ${cadavreId}`);
+  };
 
-  //   return apiData.map((cadavre) => (
-  //     <View key={cadavre.id} style={styles.cadavreContainer}>
-  //       <Text style={styles.cadavreName}>{cadavre.name}</Text>
-  //       <Text style={styles.cadavreDate}>
-  //         Début: {cadavre.startDate} - Fin: {cadavre.endDate}
-  //       </Text>
-  //       <TouchableOpacity
-  //         style={styles.cadavreButton}
-  //         onPress={() => likeCadavre(cadavre.id)}
-  //       >
-  //         <Text style={styles.cadavreButtonText}>Like</Text>
-  //       </TouchableOpacity>
-  //       <TouchableOpacity
-  //         style={styles.cadavreButton}
-  //         onPress={() => readCadavre(cadavre.id)}
-  //       >
-  //         <Text style={styles.cadavreButtonText}>Read</Text>
-  //       </TouchableOpacity>
-  //     </View>
-  //   ));
-  // };
+  const formatDate = (dateString) => {
+    const options = { year: "numeric", month: "numeric", day: "numeric" };
+    const date = new Date(dateString);
+    return date.toLocaleDateString("fr-FR", options);
+  };
+
+  const renderCadavres = () => {
+    const cadavresToRender = filteredCadavres || sortedCadavres || apiData;
+
+    if (!cadavresToRender || cadavresToRender.length === 0) {
+      return <Text style={{ color: "white" }}>Aucun cadavre trouvé.</Text>;
+    }
+
+    return apiData.map((cadavre) => (
+      <View key={cadavre.id_cadavre} style={styles.cadavreContainer}>
+        <View style={styles.cadavreContainerLeft}>
+          <Text style={styles.titleText}>{cadavre.titre_cadavre}</Text>
+          <Text style={styles.participantsText}>
+            {formatDate(cadavre.date_debut_cadavre)} -{" "}
+            {formatDate(cadavre.date_fin_cadavre)}
+          </Text>
+        </View>
+        <View style={styles.cadavreContainerRight}>
+          <TouchableOpacity
+            style={styles.cadavreButton}
+            onPress={() => likeCadavre(cadavre.id_cadavre)}
+          >
+            <Image
+              source={require("../../assets/love.png")}
+              style={styles.likeLogo}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.btnApi}
+            onPress={() => {
+              navigation.navigate("Cadavre", {
+                id_cadavre: cadavre.id_cadavre,
+              });
+            }}
+          >
+            <Image
+              source={require("../../assets/play.png")}
+              style={styles.playLogo}
+            />
+          </TouchableOpacity>
+        </View>
+      </View>
+    ));
+  };
 
   return (
     <ScrollView style={styles.home}>
@@ -106,42 +162,22 @@ const LikeScreen = () => {
           containerStyle={styles.searchContainer}
           inputContainerStyle={styles.searchInputContainer}
           inputStyle={styles.searchInput}
-          placeholderTextColor="rgba(166, 173, 190, 1)" // Couleur du texte d'espace réservé
-          clearIcon={{ color: "rgba(166, 173, 190, 1)" }} // Couleur de l'icône de suppression
-          searchIcon={{ color: "rgba(166, 173, 190, 1)" }} // Couleur de l'icône de recherche
+          placeholderTextColor="rgba(166, 173, 190, 1)"
+          clearIcon={{ color: "rgba(166, 173, 190, 1)" }}
+          searchIcon={{ color: "rgba(166, 173, 190, 1)" }}
           onChangeText={updateSearch}
           value={search}
         />
         <TouchableOpacity style={styles.buttonStyle} onPress={openModal}>
           <Image
-            width={30} // Ajustez la largeur de l'image selon vos besoins
-            height={30} // Ajustez la hauteur de l'image selon vos besoins
+            width={30}
+            height={30}
             source={require("./../../assets/filter.png")}
             style={styles.buttonImage}
           />
         </TouchableOpacity>
       </View>
-      <View style={styles.cadavreContainer}>
-        <View style={styles.cadavreContainerLeft}>
-          <Text style={styles.cadavreName}>TEST </Text>
-          <Text style={styles.cadavreDate}>7/12/2023 - 14/12/2023</Text>
-        </View>
-
-        <View style={styles.cadavreContainerRight}>
-          <TouchableOpacity
-            style={styles.cadavreButton}
-            // onPress={() => likeCadavre(cadavre.id)}
-          >
-            <Text style={styles.cadavreButtonText}>Like</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.cadavreButton}
-            // onPress={() => readCadavre(cadavre.id)}
-          >
-            <Text style={styles.cadavreButtonText}>Lire</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+      {renderCadavres()}
       <Modal
         animationType="slide"
         transparent={true}
@@ -157,9 +193,8 @@ const LikeScreen = () => {
               onValueChange={(itemValue) => handleSortChange(itemValue)}
               style={{ color: "black" }}
             >
-              <Picker.Item label="Alphabétique A-Z" value="alphabetical" />
-              <Picker.Item label="Alphabétique Z-A" value="Zalphabetical" />
-              <Picker.Item label="Date" value="date" />
+              <Picker.Item label="Tri alphabétique" value="alphabetical" />
+              <Picker.Item label="Tri par date" value="date" />
             </Picker>
 
             <TouchableOpacity

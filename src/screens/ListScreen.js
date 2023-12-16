@@ -55,7 +55,7 @@ const PercentageCircleChart = ({ percentage }) => {
   );
 };
 
-const LikeScreen = () => {
+const ListScreen = () => {
   const navigation = useNavigation();
   const [apiData, setApiData] = useState(null);
   const [search, setSearch] = useState("");
@@ -148,8 +148,6 @@ const LikeScreen = () => {
             <Picker
               selectedValue={selectedSort}
               onValueChange={(itemValue) => handleSortChange(itemValue)}
-              style={{ color: "red" }}
-              itemStyle={{ color: "red" }}
             >
               <Picker.Item label="Tri alphabétique" value="alphabetical" />
               <Picker.Item label="Tri par date" value="date" />
@@ -205,4 +203,4 @@ const LikeScreen = () => {
   );
 };
 
-export default LikeScreen;
+export default ListScreen;

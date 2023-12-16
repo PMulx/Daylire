@@ -121,8 +121,45 @@ const styles = StyleSheet.create({
   },
   cadavreContainerRight: {
     flexDirection: "row",
-    gap: 20,
+    alignItems: "center",
+    gap: 15,
     marginRight: 10,
+  },
+  apiInfoTitle: {
+    color: "#101A31",
+    fontSize: 22,
+    fontWeight: "bold",
+  },
+  apiInfoPeriode: {
+    color: "#101A31",
+    fontSize: 16,
+  },
+  apiInfoParticipants: {
+    color: "#101A31",
+    fontSize: 15,
+    fontWeight: "300",
+  },
+  titleText: {
+    fontWeight: "bold",
+    fontSize: 18,
+  },
+  participantsText: {
+    fontStyle: "italic",
+    fontSize: 14,
+  },
+  apiText: {
+    color: "#101A31",
+    fontSize: 30,
+    fontWeight: "bold",
+  },
+  btnApi: {
+    flexDirection: "row",
+    gap: 10,
+    alignItems: "center",
+    padding: 10,
+    borderRadius: 20,
+    marginBottom: 10,
+    marginTop: 10,
   },
 });
 
