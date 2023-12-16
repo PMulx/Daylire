@@ -22,42 +22,53 @@ const LikeScreen = () => {
   const [filteredCadavres, setFilteredCadavres] = useState(null);
   const [sortedCadavres, setSortedCadavres] = useState(null);
 
-  const fetchDataFromApi = async () => {
-    try {
-      const response = await fetch(
-        "https://loufok.alwaysdata.net/api/cadavres"
-      );
-      const data = await response.json();
-
-      // Mettez à jour les données avec l'état de like
-      const updatedData = await Promise.all(
-        data.map(async (cadavre) => {
-          const likedStatus = await AsyncStorage.getItem(
-            "likedCadavre" + cadavre.id_cadavre
-          );
-          return { ...cadavre, isLiked: likedStatus === "true" };
-        })
-      );
-
-      // Tri alphabétique initial en fonction du titre du cadavre
-      const sortedData = updatedData.sort((a, b) =>
-        a.titre_cadavre.localeCompare(b.titre_cadavre)
-      );
-
-      setApiData(sortedData);
-      setSortedCadavres(sortedData); // Enregistrez l'état initial trié
-    } catch (error) {
-      console.error(
-        "Erreur lors de la récupération des données de l'API",
-        error
-      );
-    }
-  };
-
   useEffect(() => {
+    const fetchDataFromApi = async () => {
+      try {
+        const response = await fetch(
+          "https://loufok.alwaysdata.net/api/cadavres"
+        );
+        const data = await response.json();
+
+        // Retrieve liked status from AsyncStorage
+        const likedCadavresFromStorage = await AsyncStorage.getAllKeys();
+        const likedStatus = await Promise.all(
+          likedCadavresFromStorage.map(async (key) => {
+            if (key.startsWith("likedCadavre")) {
+              const cadavreId = key.replace("likedCadavre", "");
+              const isLiked = (await AsyncStorage.getItem(key)) === "true";
+              return { cadavreId, isLiked };
+            }
+            return null;
+          })
+        );
+
+        // Update data with liked status
+        const updatedData = data.map((cadavre) => {
+          const likedInfo = likedStatus.find(
+            (info) => info && info.cadavreId === String(cadavre.id_cadavre)
+          );
+          return { ...cadavre, isLiked: likedInfo ? likedInfo.isLiked : false };
+        });
+
+        // Display liked status in the console
+        updatedData.forEach((cadavre) => {
+          console.log(
+            `Cadavre ${cadavre.id_cadavre} - Titre: ${cadavre.titre_cadavre}, Liké: ${cadavre.isLiked}`
+          );
+        });
+
+        setApiData(updatedData);
+      } catch (error) {
+        console.error(
+          "Erreur lors de la récupération des données de l'API",
+          error
+        );
+      }
+    };
+
     fetchDataFromApi();
   }, []);
-
   const updateSearch = (text) => {
     setSearch(text);
     if (text.trim() === "") {
@@ -117,27 +128,33 @@ const LikeScreen = () => {
     );
   };
 
-  const likeCadavre = async (cadavreId) => {
+  const likeCadavre = async (cadavre) => {
     // Appel à l'API pour liker ou ne pas liker le cadavre
     try {
-      const likeEndpoint = isLiked
-        ? `https://loufok.alwaysdata.net/api/cadavre/${cadavreId}/remove_like`
-        : `https://loufok.alwaysdata.net/api/cadavre/${cadavreId}/add_like`;
+      const likeEndpoint = cadavre.isLiked
+        ? `https://loufok.alwaysdata.net/api/cadavre/${cadavre.id_cadavre}/remove_like`
+        : `https://loufok.alwaysdata.net/api/cadavre/${cadavre.id_cadavre}/add_like`;
 
       const response = await fetch(likeEndpoint);
       const data = await response.json();
 
       const updatedData = {
         ...data,
-        nb_jaime: isLiked ? data.nb_jaime - 1 : data.nb_jaime + 1,
+        nb_jaime: cadavre.isLiked ? data.nb_jaime - 1 : data.nb_jaime + 1,
+        isLiked: !cadavre.isLiked, // Mise à jour de la propriété isLiked
       };
 
       await AsyncStorage.setItem(
         "likedCadavre" + updatedData.id_cadavre,
-        String(!isLiked)
+        String(updatedData.isLiked)
       );
 
-      updateCadavreIsLiked(cadavreId, !isLiked);
+      // Mise à jour de l'état local directement dans apiData
+      setApiData((prevApiData) =>
+        prevApiData.map((c) =>
+          c.id_cadavre === cadavre.id_cadavre ? updatedData : c
+        )
+      );
     } catch (error) {
       console.error(
         "Erreur lors de la récupération ou de la mise à jour des données de l'API",
@@ -153,15 +170,14 @@ const LikeScreen = () => {
   };
 
   const renderCadavres = () => {
-    const cadavresToRender = (
-      (filteredCadavres || sortedCadavres || apiData) ??
-      []
-    ).filter((cadavre) => likedCadavres.includes(cadavre.id_cadavre));
+    const cadavresToRender =
+      (filteredCadavres || sortedCadavres || apiData)?.filter((cadavre) =>
+        likedCadavres.includes(cadavre.id_cadavre)
+      ) ?? [];
 
     if (!cadavresToRender || cadavresToRender.length === 0) {
       return <Text style={{ color: "white" }}>Aucun cadavre aimé trouvé.</Text>;
     }
-
     return cadavresToRender.map((cadavre) => (
       <View key={cadavre.id_cadavre} style={styles.cadavreContainer}>
         <View style={styles.cadavreContainerLeft}>

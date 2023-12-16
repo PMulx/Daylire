@@ -15,8 +15,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#A4FA82",
     color: "#101A31",
     padding: 10,
+    gap: 10,
     borderRadius: 20,
-    width: "70%",
   },
   textLoufok: {
     fontSize: 20,
