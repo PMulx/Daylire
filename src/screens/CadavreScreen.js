@@ -40,14 +40,10 @@ const CadavreScreen = ({ route }) => {
 
   const fetchLikeStatus = async () => {
     try {
-      const likedStatus = await AsyncStorage.getItem(
-        "likedCadavre" + id_cadavre
-      );
-
-      console.log("Liked status from AsyncStorage:", likedStatus);
-
+      const likedStatus = await AsyncStorage.getItem("likedCadavres");
       if (likedStatus !== null) {
-        setIsLiked(likedStatus === "true");
+        const likedCadavres = JSON.parse(likedStatus);
+        setIsLiked(likedCadavres.includes(id_cadavre));
       }
     } catch (error) {
       console.error("Erreur lors de la récupération de l'état de like", error);
@@ -56,17 +52,12 @@ const CadavreScreen = ({ route }) => {
 
   const handleLike = async () => {
     try {
-      console.log("Attempting to like or unlike cadavre:", id_cadavre);
       const likeEndpoint = isLiked
         ? `https://loufok.alwaysdata.net/api/cadavre/${id_cadavre}/remove_like`
         : `https://loufok.alwaysdata.net/api/cadavre/${id_cadavre}/add_like`;
 
-      console.log("Like endpoint:", likeEndpoint);
-
       const response = await fetch(likeEndpoint);
       const data = await response.json();
-
-      console.log("API response after liking:", data);
 
       const updatedData = {
         ...data,
@@ -74,25 +65,30 @@ const CadavreScreen = ({ route }) => {
       };
 
       // Update liked status in AsyncStorage
+      const likedCadavres = await AsyncStorage.getItem("likedCadavres");
+      let likedCadavresArray = likedCadavres ? JSON.parse(likedCadavres) : [];
+
+      if (isLiked) {
+        likedCadavresArray = likedCadavresArray.filter(
+          (cadavreId) => cadavreId !== id_cadavre
+        );
+      } else {
+        likedCadavresArray.push(id_cadavre);
+      }
+
       await AsyncStorage.setItem(
-        "likedCadavre" + updatedData.id_cadavre,
-        String(!isLiked)
+        "likedCadavres",
+        JSON.stringify(likedCadavresArray)
       );
 
-      console.log("Updated data after liking:", updatedData);
-
       // Utilisez une fonction de mise à jour pour garantir la mise à jour basée sur la dernière valeur
-      setIsLiked((prevIsLiked) => !prevIsLiked);
+      setIsLiked(!isLiked);
       setApiData(updatedData);
-
-      // Remove likedCadavre from AsyncStorage if disliked
-      if (isLiked) {
-        await AsyncStorage.removeItem("likedCadavre" + updatedData.id_cadavre);
-      }
     } catch (error) {
       console.error("Error while fetching or updating API data:", error);
     }
   };
+
   const renderContributions = () => {
     return apiData[0].contributions.map((contribution, index) => (
       <Text style={styles.contributionText} key={index}>
