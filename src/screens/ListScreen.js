@@ -10,6 +10,7 @@ import {
   Modal,
   Text,
   Button,
+  RefreshControl,
 } from "react-native";
 import { SearchBar } from "react-native-elements";
 import styles from "./../styles/ListScreenStyles";
@@ -63,6 +64,7 @@ const ListScreen = () => {
   const [selectedSort, setSelectedSort] = useState("alphabetical");
   const [filteredCadavres, setFilteredCadavres] = useState(null);
   const [sortedCadavres, setSortedCadavres] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   const fetchDataFromApi = async () => {
     try {
@@ -82,6 +84,15 @@ const ListScreen = () => {
   useEffect(() => {
     fetchDataFromApi();
   }, []);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await fetchDataFromApi();
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "numeric", day: "numeric" };
@@ -144,7 +155,12 @@ const ListScreen = () => {
   };
 
   return (
-    <ScrollView style={styles.home}>
+    <ScrollView
+      style={styles.home}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+      }
+    >
       <View style={styles.header}>
         <Image source={require("../../assets/logo.png")} style={styles.logo} />
         <TouchableOpacity onPress={() => alert("Icône de question cliquée")}>

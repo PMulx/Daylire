@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { View, Image, TouchableOpacity, ScrollView, Text } from "react-native";
+import {
+  View,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  Text,
+  RefreshControl,
+} from "react-native";
 import styles from "./../styles/LikeScreenStyles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -8,6 +15,7 @@ const LikeScreen = () => {
   const navigation = useNavigation();
   const [cadavres, setCadavres] = useState([]);
   const [likedCadavresArray, setLikedCadavresArray] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
 
   const getValueFromAsyncStorage = async () => {
     try {
@@ -22,6 +30,35 @@ const LikeScreen = () => {
       }
     } catch (error) {
       console.error("Erreur lors de la récupération de la valeur:", error);
+    }
+  };
+
+  const updateLikedCadavresInAsyncStorage = async () => {
+    try {
+      const likedStatus = await AsyncStorage.getItem("likedCadavres");
+      if (likedStatus !== null) {
+        const likedCadavres = JSON.parse(likedStatus);
+        // Mettez à jour les données en fonction des nouvelles données obtenues de l'API
+        const updatedLikedCadavres = likedCadavres.filter(
+          (cadavreId) => !cadavres.map((c) => c.id_cadavre).includes(cadavreId)
+        );
+        await AsyncStorage.setItem(
+          "likedCadavres",
+          JSON.stringify(updatedLikedCadavres)
+        );
+        setLikedCadavresArray(updatedLikedCadavres);
+      }
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour d'AsyncStorage :", error);
+    }
+  };
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await updateLikedCadavresInAsyncStorage();
+    } finally {
+      setRefreshing(false);
     }
   };
 
@@ -92,7 +129,11 @@ const LikeScreen = () => {
   };
 
   return (
-    <ScrollView>
+    <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+      }
+    >
       {cadavres.map((cadavre) => (
         <View key={cadavre.id_cadavre} style={styles.cadavreContainer}>
           <View style={styles.cadavreContainerLeft}>

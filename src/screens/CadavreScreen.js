@@ -9,6 +9,7 @@ import {
   Modal,
   Text,
   Button,
+  RefreshControl,
 } from "react-native";
 import styles from "./../styles/CadavreScreenStyles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -17,6 +18,7 @@ const CadavreScreen = ({ route }) => {
   const { id_cadavre } = route.params;
   const [apiData, setApiData] = useState(null);
   const [isLiked, setIsLiked] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const fetchDataFromApi = async () => {
     try {
@@ -97,6 +99,29 @@ const CadavreScreen = ({ route }) => {
     ));
   };
 
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await fetchDataFromApi();
+
+      // Mise à jour des données dans AsyncStorage
+      const likedStatus = await AsyncStorage.getItem("likedCadavres");
+      if (likedStatus !== null) {
+        const likedCadavres = JSON.parse(likedStatus);
+        // Mettez à jour les données en fonction des nouvelles données obtenues de l'API
+        const updatedLikedCadavres = likedCadavres.filter(
+          (cadavreId) => cadavreId !== id_cadavre
+        );
+        await AsyncStorage.setItem(
+          "likedCadavres",
+          JSON.stringify(updatedLikedCadavres)
+        );
+      }
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   const renderPlumeText = () => {
     return (
       <Text style={styles.plumeText}>
@@ -117,7 +142,13 @@ const CadavreScreen = ({ route }) => {
   };
 
   return (
-    <ScrollView style={styles.home} stickyHeaderIndices={[1]}>
+    <ScrollView
+      style={styles.home}
+      stickyHeaderIndices={[1]}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+      }
+    >
       {apiData && (
         <>
           <View style={styles.header}>

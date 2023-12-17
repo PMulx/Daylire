@@ -7,12 +7,14 @@ import {
   TouchableOpacity,
   ScrollView,
   Linking,
+  RefreshControl,
 } from "react-native";
 import styles from "../styles/HomeScreenStyles";
 
 const HomeScreen = () => {
   const navigation = useNavigation();
   const [apiData, setApiData] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   const fetchDataFromApi = async () => {
     try {
@@ -33,8 +35,22 @@ const HomeScreen = () => {
     fetchDataFromApi();
   }, []);
 
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await fetchDataFromApi();
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   return (
-    <ScrollView style={styles.home}>
+    <ScrollView
+      style={styles.home}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+      }
+    >
       <View style={styles.header}>
         <Image source={require("../../assets/logo.png")} style={styles.logo} />
         <TouchableOpacity onPress={() => alert("Icône de question cliquée")}>
