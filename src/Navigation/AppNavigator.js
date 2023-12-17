@@ -54,21 +54,21 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
             return (
               <Image
                 source={require("../../assets/list.png")}
-                style={{ width: 34, height: 34 }}
+                style={{ width: 34, height: 34, resizeMode: "contain" }}
               />
             );
           } else if (route.name === "Home") {
             return (
               <Image
                 source={require("../../assets/home.png")}
-                style={{ width: 34, height: 34 }}
+                style={{ width: 34, height: 34, resizeMode: "contain" }}
               />
             );
           } else if (route.name === "Like") {
             return (
               <Image
                 source={require("../../assets/like.png")}
-                style={{ width: 34, height: 34 }}
+                style={{ width: 34, height: 34, resizeMode: "contain" }}
               />
             );
           }

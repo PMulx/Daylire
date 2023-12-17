@@ -25,10 +25,12 @@ const styles = StyleSheet.create({
   loufokLogo: {
     width: 35,
     height: 35,
+    resizeMode: "contain",
   },
   playLogo: {
     width: 25,
     height: 25,
+    resizeMode: "contain",
   },
   text: {
     fontSize: 18,
@@ -46,10 +48,12 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
     width: 200,
     height: 100,
+    resizeMode: "contain",
   },
   questionIcon: {
     width: 50,
     height: 50,
+    resizeMode: "contain",
   },
   paragraph: {
     marginTop: 20,

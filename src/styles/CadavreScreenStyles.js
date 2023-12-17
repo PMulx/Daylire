@@ -28,33 +28,12 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
     width: 200,
     height: 100,
+    resizeMode: "contain",
   },
   questionIcon: {
     width: 50,
     height: 50,
-  },
-
-  // Button styles
-  btn: {
-    alignSelf: "center",
-    marginTop: 30,
-    marginBottom: 20,
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-    backgroundColor: secondaryColor,
-    color: primaryColor,
-    padding: 10,
-    borderRadius: 20,
-    width: "70%",
-  },
-  textLoufok: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  loufokLogo: {
-    width: 35,
-    height: 35,
+    resizeMode: "contain",
   },
 
   // Title styles

@@ -18,17 +18,11 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     width: "70%",
   },
-  textLoufok: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  loufokLogo: {
-    width: 35,
-    height: 35,
-  },
+
   playLogo: {
     width: 25,
     height: 25,
+    resizeMode: "contain",
   },
   text: {
     fontSize: 18,
@@ -50,6 +44,7 @@ const styles = StyleSheet.create({
   questionIcon: {
     width: 50,
     height: 50,
+    resizeMode: "contain",
   },
   searchContainer: {
     backgroundColor: "rgba(166, 173, 190, 0)", // Couleur de fond
@@ -70,12 +65,14 @@ const styles = StyleSheet.create({
     borderRadius: 5, // Bordure arrondie
     width: 50,
     height: 50,
+    resizeMode: "contain",
   },
   filter: {
     alignItems: "center",
     justifyContent: "space-between",
     flexDirection: "row",
     marginBottom: 20,
+    resizeMode: "contain",
   },
   modalContainer: {
     flex: 1,
