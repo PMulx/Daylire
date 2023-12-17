@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
+import { Picker } from "@react-native-picker/picker";
 import {
   View,
   Image,
   TouchableOpacity,
   ScrollView,
+  Modal,
   Text,
   RefreshControl,
 } from "react-native";
 import styles from "./../styles/LikeScreenStyles";
+import { SearchBar } from "react-native-elements";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const LikeScreen = () => {
@@ -16,6 +19,11 @@ const LikeScreen = () => {
   const [cadavres, setCadavres] = useState([]);
   const [likedCadavresArray, setLikedCadavresArray] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedSort, setSelectedSort] = useState("alphabetical");
+  const [filteredCadavres, setFilteredCadavres] = useState(null);
+  const [sortedCadavres, setSortedCadavres] = useState(null);
+  const [search, setSearch] = useState("");
 
   const getValueFromAsyncStorage = async () => {
     try {
@@ -127,14 +135,123 @@ const LikeScreen = () => {
       );
     }
   };
+  const updateSearch = (text) => {
+    setSearch(text);
 
+    if (text.trim() === "") {
+      setFilteredCadavres(cadavres);
+    } else {
+      const filtered = cadavres.filter((cadavre) =>
+        cadavre.titre_cadavre.toLowerCase().includes(text.toLowerCase())
+      );
+      setFilteredCadavres(filtered);
+    }
+  };
+
+  const openModal = () => {
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+  };
+  const handleSortChange = (itemValue) => {
+    setSelectedSort(itemValue);
+
+    let sortedData;
+
+    if (itemValue === "alphabetical") {
+      // Tri alphabétique en fonction du titre du cadavre
+      sortedData = cadavres.sort((a, b) =>
+        a.titre_cadavre.localeCompare(b.titre_cadavre)
+      );
+    } else if (itemValue === "date") {
+      // Tri par la date de fin du cadavre
+      sortedData = cadavres.sort(
+        (a, b) => new Date(a.date_fin_cadavre) - new Date(b.date_fin_cadavre)
+      );
+    }
+
+    setSortedCadavres(sortedData);
+  };
+  const sortCadavres = (cadavres, sortOption) => {
+    if (sortOption === "alphabetical") {
+      return cadavres
+        .slice()
+        .sort((a, b) => a.titre_cadavre.localeCompare(b.titre_cadavre));
+    } else if (sortOption === "date") {
+      return cadavres
+        .slice()
+        .sort(
+          (a, b) =>
+            new Date(b.date_debut_cadavre) - new Date(a.date_debut_cadavre)
+        );
+    }
+    return cadavres;
+  };
   return (
     <ScrollView
+      style={styles.home}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
       }
     >
-      {cadavres.map((cadavre) => (
+      <View style={styles.header}>
+        <Image source={require("../../assets/logo.png")} style={styles.logo} />
+        <TouchableOpacity onPress={() => alert("Icône de question cliquée")}>
+          <Image
+            source={require("../../assets/question.png")}
+            style={styles.questionIcon}
+          />
+        </TouchableOpacity>
+      </View>
+      <View style={styles.filter}>
+        <SearchBar
+          placeholder="Rechercher le nom"
+          containerStyle={styles.searchContainer}
+          inputContainerStyle={styles.searchInputContainer}
+          inputStyle={styles.searchInput}
+          placeholderTextColor="rgba(166, 173, 190, 1)" // Couleur du texte d'espace réservé
+          clearIcon={{ color: "rgba(166, 173, 190, 1)" }} // Couleur de l'icône de suppression
+          searchIcon={{ color: "rgba(166, 173, 190, 1)" }} // Couleur de l'icône de recherche
+          onChangeText={updateSearch}
+          value={search}
+        />
+        <TouchableOpacity style={styles.buttonStyle} onPress={openModal}>
+          <Image
+            source={require("./../../assets/filter.png")}
+            style={styles.buttonImage}
+          />
+        </TouchableOpacity>
+      </View>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={closeModal}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text>Trier par :</Text>
+
+            <Picker
+              selectedValue={selectedSort}
+              onValueChange={(itemValue) => handleSortChange(itemValue)}
+            >
+              <Picker.Item label="Tri alphabétique" value="alphabetical" />
+              <Picker.Item label="Tri par date" value="date" />
+            </Picker>
+
+            <TouchableOpacity
+              style={styles.closeModalButton}
+              onPress={closeModal}
+            >
+              <Text style={styles.closeModalButtonText}>Fermer</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+      {(filteredCadavres || []).map((cadavre, index) => (
         <View key={cadavre.id_cadavre} style={styles.cadavreContainer}>
           <View style={styles.cadavreContainerLeft}>
             <Text style={styles.titleText}>{cadavre.titre_cadavre}</Text>

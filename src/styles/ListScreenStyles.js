@@ -61,11 +61,15 @@ const styles = StyleSheet.create({
   },
   buttonStyle: {
     backgroundColor: "#EEEFF2", // Couleur de fond du bouton
-    padding: 10, // Espacement interne du bouton
     borderRadius: 5, // Bordure arrondie
     width: 50,
     height: 50,
-    resizeMode: "contain",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  buttonImage: {
+    width: 25,
+    height: 25,
   },
   filter: {
     alignItems: "center",
