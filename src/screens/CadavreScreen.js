@@ -1,14 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Picker } from "@react-native-picker/picker";
-import { Svg, Circle, Text as SvgText } from "react-native-svg";
 import {
   View,
   Image,
   TouchableOpacity,
   ScrollView,
-  Modal,
   Text,
-  Button,
   RefreshControl,
 } from "react-native";
 import styles from "./../styles/CadavreScreenStyles";
@@ -52,6 +48,7 @@ const CadavreScreen = ({ route }) => {
       console.error("Erreur lors de la récupération de l'état de like", error);
     }
   };
+  console.log(id_cadavre);
 
   const handleLike = async () => {
     try {
@@ -59,24 +56,23 @@ const CadavreScreen = ({ route }) => {
         ? "https://loufok.alwaysdata.net/api/cadavre/remove_like"
         : "https://loufok.alwaysdata.net/api/cadavre/add_like";
 
-      const method = isLiked ? "DELETE" : "POST";
+      const method = "POST";
 
       const response = await fetch(likeEndpoint, {
         method,
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ id_cadavre }),
+        body: JSON.stringify({ id: id_cadavre }), // Utilisation de la propriété "id" au lieu de "id_cadavre"
       });
 
       if (response.ok) {
         const data = await response.json();
-
+        console.log(data);
         const updatedData = {
           ...data,
           nb_jaime: isLiked ? data.nb_jaime - 1 : data.nb_jaime + 1,
         };
-
         // Update liked status in AsyncStorage
         const likedCadavres = await AsyncStorage.getItem("likedCadavres");
         let likedCadavresArray = likedCadavres ? JSON.parse(likedCadavres) : [];
@@ -93,24 +89,27 @@ const CadavreScreen = ({ route }) => {
           "likedCadavres",
           JSON.stringify(likedCadavresArray)
         );
-
-        // Utilisez une fonction de mise à jour pour garantir la mise à jour basée sur la dernière valeur
+        console.log(updatedData);
         setIsLiked(!isLiked);
         setApiData(updatedData);
       } else {
-        console.error("Error in API response:", response);
+        console.error(
+          "Error in API response:",
+          response.status,
+          response.statusText
+        );
+
+        // If the response contains JSON, try to parse and log it
+        try {
+          const errorData = await response.json();
+          console.error("Error data:", errorData);
+        } catch (jsonError) {
+          console.error("Unable to parse error data as JSON:", jsonError);
+        }
       }
     } catch (error) {
       console.error("Error while fetching or updating API data:", error);
     }
-  };
-
-  const renderContributions = () => {
-    return apiData.contributions.map((contribution, index) => (
-      <Text style={styles.contributionText} key={index}>
-        {contribution.texte_contribution}
-      </Text>
-    ));
   };
 
   const handleRefresh = async () => {
@@ -136,24 +135,6 @@ const CadavreScreen = ({ route }) => {
     }
   };
 
-  const renderPlumeText = () => {
-    return (
-      <Text style={styles.plumeText}>
-        Ecrivains :{" "}
-        {apiData.contributions
-          .filter((contribution) => contribution.nom_plume !== "Administrateur")
-          .map((contribution, index) => (
-            <Text key={index}>{contribution.nom_plume} </Text>
-          ))}
-      </Text>
-    );
-  };
-
-  const formatDate = (dateString) => {
-    const options = { year: "numeric", month: "numeric", day: "numeric" };
-    const date = new Date(dateString);
-    return date.toLocaleDateString("fr-FR", options);
-  };
   return (
     <ScrollView
       style={styles.home}
@@ -187,27 +168,18 @@ const CadavreScreen = ({ route }) => {
             </View>
           </View>
           <View style={styles.scrollView}>
-            {apiData.contributions.map((contribution, index) => (
-              <Text style={styles.contributionText} key={index}>
-                {contribution.texte_contribution}
-              </Text>
-            ))}
-            <Text style={styles.plumeText}>
-              Ecrivains :{" "}
-              {apiData.contributions
-                .filter(
-                  (contribution) => contribution.nom_plume !== "Administrateur"
-                )
-                .map((contribution, index, array) => (
+            {apiData.contributions && (
+              <Text style={styles.contributionText}>
+                {apiData.contributions.map((contribution, index) => (
                   <React.Fragment key={index}>
-                    <Text>{contribution.nom_plume}</Text>
-                    {index < array.length - 1 ? (
-                      <Text>, </Text>
-                    ) : (
-                      <Text> </Text>
-                    )}
+                    {contribution.texte_contribution}
+                    {"\n\n"} {/* Ajoutez une marge entre chaque contribution */}
                   </React.Fragment>
                 ))}
+              </Text>
+            )}
+            <Text style={styles.plumeText}>
+              Ecrivains : {apiData?.contributeurs && apiData.contributeurs[0]}
               <Text>.</Text>
             </Text>
           </View>
