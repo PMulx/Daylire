@@ -1,13 +1,27 @@
 import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { View, Image, TouchableOpacity, ScrollView, Text } from "react-native";
+import {
+  View,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  Modal,
+  Text,
+} from "react-native";
 import styles from "./../styles/LikeScreenStyles";
+import { SearchBar } from "react-native-elements";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Picker } from "@react-native-picker/picker";
 
 const LikeScreen = () => {
   const navigation = useNavigation();
   const [cadavres, setCadavres] = useState([]);
   const [likedCadavresArray, setLikedCadavresArray] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedSort, setSelectedSort] = useState("alphabetical");
+  const [filteredCadavres, setFilteredCadavres] = useState(null);
+  const [sortedCadavres, setSortedCadavres] = useState(null);
+  const [search, setSearch] = useState("");
 
   const getValueFromAsyncStorage = async () => {
     try {
@@ -30,13 +44,16 @@ const LikeScreen = () => {
       const response = await fetch(
         `https://loufok.alwaysdata.net/api/cadavres`
       );
-      const cadavreDataArray = await response.json();
+      const data = await response.json();
 
-      const matchedCadavres = cadavreDataArray.filter((cadavre) =>
-        likedCadavresArray.includes(cadavre.id_cadavre)
-      );
+      // Assurez-vous que la propriété "cadavres" existe dans la réponse
+      if (data && data.cadavres) {
+        const matchedCadavres = data.cadavres.filter((cadavre) =>
+          likedCadavresArray.includes(cadavre.id_cadavre)
+        );
 
-      setCadavres(matchedCadavres);
+        setCadavres(matchedCadavres);
+      }
     } catch (error) {
       console.error(
         "Erreur lors de la récupération des données des cadavres:",
@@ -45,10 +62,51 @@ const LikeScreen = () => {
     }
   };
 
+  const updateSearch = (text) => {
+    setSearch(text);
+
+    if (text.trim() === "") {
+      setFilteredCadavres(cadavres);
+    } else {
+      const filtered = cadavres.filter((cadavre) =>
+        cadavre.titre_cadavre.toLowerCase().includes(text.toLowerCase())
+      );
+      setFilteredCadavres(filtered);
+    }
+  };
+
+  const openModal = () => {
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+  };
+
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "numeric", day: "numeric" };
     const date = new Date(dateString);
     return date.toLocaleDateString("fr-FR", options);
+  };
+
+  const handleSortChange = (itemValue) => {
+    setSelectedSort(itemValue);
+
+    let sortedData;
+
+    if (itemValue === "alphabetical") {
+      // Tri alphabétique en fonction du titre du cadavre
+      sortedData = cadavres.sort((a, b) =>
+        a.titre_cadavre.localeCompare(b.titre_cadavre)
+      );
+    } else if (itemValue === "date") {
+      // Tri par la date de fin du cadavre
+      sortedData = cadavres.sort(
+        (a, b) => new Date(a.date_fin_cadavre) - new Date(b.date_fin_cadavre)
+      );
+    }
+
+    setSortedCadavres(sortedData);
   };
 
   const removeLikedCadavre = async (id_cadavre) => {
@@ -98,7 +156,56 @@ const LikeScreen = () => {
   }, [navigation]);
 
   return (
-    <ScrollView>
+    <ScrollView style={styles.home}>
+      <View style={styles.header}>
+        <Image source={require("../../assets/logo.png")} style={styles.logo} />
+      </View>
+      <View style={styles.filter}>
+        <SearchBar
+          placeholder="Rechercher le nom"
+          containerStyle={styles.searchContainer}
+          inputContainerStyle={styles.searchInputContainer}
+          inputStyle={styles.searchInput}
+          placeholderTextColor="rgba(166, 173, 190, 1)" // Couleur du texte d'espace réservé
+          clearIcon={{ color: "rgba(166, 173, 190, 1)" }} // Couleur de l'icône de suppression
+          searchIcon={{ color: "rgba(166, 173, 190, 1)" }} // Couleur de l'icône de recherche
+          onChangeText={updateSearch}
+          value={search}
+        />
+        <TouchableOpacity style={styles.buttonStyle} onPress={openModal}>
+          <Image
+            source={require("./../../assets/filter.png")}
+            style={styles.buttonImage}
+          />
+        </TouchableOpacity>
+      </View>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={closeModal}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text>Trier par :</Text>
+
+            <Picker
+              selectedValue={selectedSort}
+              onValueChange={(itemValue) => handleSortChange(itemValue)}
+            >
+              <Picker.Item label="Tri alphabétique" value="alphabetical" />
+              <Picker.Item label="Tri par date" value="date" />
+            </Picker>
+
+            <TouchableOpacity
+              style={styles.closeModalButton}
+              onPress={closeModal}
+            >
+              <Text style={styles.closeModalButtonText}>Fermer</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
       {cadavres.map((cadavre) => (
         <View key={cadavre.id_cadavre} style={styles.cadavreContainer}>
           <View style={styles.cadavreContainerLeft}>

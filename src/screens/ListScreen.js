@@ -72,7 +72,11 @@ const ListScreen = () => {
         "https://loufok.alwaysdata.net/api/cadavres"
       );
       const data = await response.json();
-      setApiData(data);
+
+      // Assurez-vous que la propriété "cadavres" existe dans la réponse
+      if (data && data.cadavres) {
+        setApiData(data.cadavres);
+      }
     } catch (error) {
       console.error(
         "Erreur lors de la récupération des données de l'API",
@@ -163,12 +167,6 @@ const ListScreen = () => {
     >
       <View style={styles.header}>
         <Image source={require("../../assets/logo.png")} style={styles.logo} />
-        <TouchableOpacity onPress={() => alert("Icône de question cliquée")}>
-          <Image
-            source={require("../../assets/question.png")}
-            style={styles.questionIcon}
-          />
-        </TouchableOpacity>
       </View>
       <View style={styles.filter}>
         <SearchBar
@@ -219,40 +217,41 @@ const ListScreen = () => {
         </View>
       </Modal>
       {(filteredCadavres || apiData || []).map((data, index) => (
-        <View key={index} style={styles.apiDiv}>
-          <View style={styles.apiInfo}>
-            <Text style={styles.apiInfoTitle}>
-              <Text style={styles.titleText}>{data.titre_cadavre}</Text> -{" "}
-              <Text style={styles.participantsText}>
-                {data.nb_contributions} participants
+        <TouchableOpacity
+          style={styles.btnApi}
+          key={index}
+          onPress={() => {
+            navigation.navigate("Cadavre", {
+              id_cadavre: data.id_cadavre,
+            });
+          }}
+        >
+          <View key={index} style={styles.apiDiv}>
+            <View style={styles.apiInfo}>
+              <Text style={styles.apiInfoTitle}>
+                <Text style={styles.titleText}>{data.titre_cadavre}</Text> -{" "}
+                <Text style={styles.participantsText}>
+                  {data.nb_contributions} participants
+                </Text>
               </Text>
-            </Text>
-            <Text style={styles.apiInfoPeriode}>
-              {formatDate(data.date_debut_cadavre)} -{" "}
-              {formatDate(data.date_fin_cadavre)}
-            </Text>
-          </View>
-          <View style={styles.percentageCircleContainer}>
-            <PercentageCircleChart
-              percentage={Math.round(
-                (data.nb_contributions / data.nb_contributions_max) * 100
-              )}
-            />
-          </View>
-          <TouchableOpacity
-            style={styles.btnApi}
-            onPress={() => {
-              navigation.navigate("Cadavre", {
-                id_cadavre: data.id_cadavre,
-              });
-            }}
-          >
+              <Text style={styles.apiInfoPeriode}>
+                {formatDate(data.date_debut_cadavre)} -{" "}
+                {formatDate(data.date_fin_cadavre)}
+              </Text>
+            </View>
+            <View style={styles.percentageCircleContainer}>
+              <PercentageCircleChart
+                percentage={Math.round(
+                  (data.nb_contributions / data.nb_contributions_max) * 100
+                )}
+              />
+            </View>
             <Image
               source={require("../../assets/play.png")}
               style={styles.playLogo}
             />
-          </TouchableOpacity>
-        </View>
+          </View>
+        </TouchableOpacity>
       ))}
     </ScrollView>
   );

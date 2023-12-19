@@ -80,6 +80,7 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
             style={{
               flex: isCadavreScreen ? 0 : 1, // Ajuster le nombre d'éléments par ligne pour Cadavre
               alignItems: "center",
+              paddingVertical: 10,
               backgroundColor: isFocused ? "#A4FA82" : "transparent",
               borderRadius: 350,
             }}

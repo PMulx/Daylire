@@ -28,7 +28,6 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
     width: 200,
     height: 100,
-    resizeMode: "contain",
   },
   questionIcon: {
     width: 50,
@@ -80,6 +79,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     gap: 8,
+  },
+  likeLogo: {
+    width: 30,
+    height: 30,
+    resizeMode: "contain",
   },
 });
 

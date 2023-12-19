@@ -61,11 +61,15 @@ const styles = StyleSheet.create({
   },
   buttonStyle: {
     backgroundColor: "#EEEFF2", // Couleur de fond du bouton
-    padding: 10, // Espacement interne du bouton
     borderRadius: 5, // Bordure arrondie
     width: 50,
     height: 50,
-    resizeMode: "contain",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  buttonImage: {
+    width: 25,
+    height: 25,
   },
   filter: {
     alignItems: "center",
@@ -118,6 +122,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
   },
   apiInfoTitle: {
+    textTransform: "capitalize",
     color: "#101A31",
     fontSize: 22,
     fontWeight: "bold",
@@ -145,10 +150,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   btnApi: {
-    flexDirection: "row",
-    gap: 10,
-    alignItems: "center",
-    padding: 10,
     borderRadius: 20,
     marginBottom: 10,
     marginTop: 10,

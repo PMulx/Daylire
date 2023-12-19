@@ -26,6 +26,7 @@ const CadavreScreen = ({ route }) => {
         "https://loufok.alwaysdata.net/api/cadavre/" + id_cadavre
       );
       const data = await response.json();
+      console.log(data);
       setApiData(data);
     } catch (error) {
       console.error(
@@ -55,44 +56,57 @@ const CadavreScreen = ({ route }) => {
   const handleLike = async () => {
     try {
       const likeEndpoint = isLiked
-        ? `https://loufok.alwaysdata.net/api/cadavre/${id_cadavre}/remove_like`
-        : `https://loufok.alwaysdata.net/api/cadavre/${id_cadavre}/add_like`;
+        ? "https://loufok.alwaysdata.net/api/cadavre/remove_like"
+        : "https://loufok.alwaysdata.net/api/cadavre/add_like";
 
-      const response = await fetch(likeEndpoint);
-      const data = await response.json();
+      const method = isLiked ? "DELETE" : "POST";
 
-      const updatedData = {
-        ...data,
-        nb_jaime: isLiked ? data.nb_jaime - 1 : data.nb_jaime + 1,
-      };
+      const response = await fetch(likeEndpoint, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id_cadavre }),
+      });
 
-      // Update liked status in AsyncStorage
-      const likedCadavres = await AsyncStorage.getItem("likedCadavres");
-      let likedCadavresArray = likedCadavres ? JSON.parse(likedCadavres) : [];
+      if (response.ok) {
+        const data = await response.json();
 
-      if (isLiked) {
-        likedCadavresArray = likedCadavresArray.filter(
-          (cadavreId) => cadavreId !== id_cadavre
+        const updatedData = {
+          ...data,
+          nb_jaime: isLiked ? data.nb_jaime - 1 : data.nb_jaime + 1,
+        };
+
+        // Update liked status in AsyncStorage
+        const likedCadavres = await AsyncStorage.getItem("likedCadavres");
+        let likedCadavresArray = likedCadavres ? JSON.parse(likedCadavres) : [];
+
+        if (isLiked) {
+          likedCadavresArray = likedCadavresArray.filter(
+            (cadavreId) => cadavreId !== id_cadavre
+          );
+        } else {
+          likedCadavresArray.push(id_cadavre);
+        }
+
+        await AsyncStorage.setItem(
+          "likedCadavres",
+          JSON.stringify(likedCadavresArray)
         );
+
+        // Utilisez une fonction de mise à jour pour garantir la mise à jour basée sur la dernière valeur
+        setIsLiked(!isLiked);
+        setApiData(updatedData);
       } else {
-        likedCadavresArray.push(id_cadavre);
+        console.error("Error in API response:", response);
       }
-
-      await AsyncStorage.setItem(
-        "likedCadavres",
-        JSON.stringify(likedCadavresArray)
-      );
-
-      // Utilisez une fonction de mise à jour pour garantir la mise à jour basée sur la dernière valeur
-      setIsLiked(!isLiked);
-      setApiData(updatedData);
     } catch (error) {
       console.error("Error while fetching or updating API data:", error);
     }
   };
 
   const renderContributions = () => {
-    return apiData[0].contributions.map((contribution, index) => (
+    return apiData.contributions.map((contribution, index) => (
       <Text style={styles.contributionText} key={index}>
         {contribution.texte_contribution}
       </Text>
@@ -126,7 +140,7 @@ const CadavreScreen = ({ route }) => {
     return (
       <Text style={styles.plumeText}>
         Ecrivains :{" "}
-        {apiData[0].contributions
+        {apiData.contributions
           .filter((contribution) => contribution.nom_plume !== "Administrateur")
           .map((contribution, index) => (
             <Text key={index}>{contribution.nom_plume} </Text>
@@ -140,7 +154,6 @@ const CadavreScreen = ({ route }) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("fr-FR", options);
   };
-
   return (
     <ScrollView
       style={styles.home}
@@ -156,19 +169,11 @@ const CadavreScreen = ({ route }) => {
               source={require("../../assets/logo.png")}
               style={styles.logo}
             />
-            <TouchableOpacity
-              onPress={() => alert("Icône de question cliquée")}
-            >
-              <Image
-                source={require("../../assets/question.png")}
-                style={styles.questionIcon}
-              />
-            </TouchableOpacity>
           </View>
           <View style={styles.topBar}>
-            <Text style={styles.title}>{apiData[0].titre_cadavre}</Text>
+            <Text style={styles.title}>{apiData.titre_cadavre}</Text>
             <View style={styles.likeSection}>
-              <Text style={{ color: "white" }}>{apiData[0].nb_jaime}</Text>
+              <Text style={{ color: "white" }}>{apiData.nb_jaime}</Text>
               <TouchableOpacity onPress={handleLike}>
                 <Image
                   source={
@@ -182,14 +187,14 @@ const CadavreScreen = ({ route }) => {
             </View>
           </View>
           <View style={styles.scrollView}>
-            {apiData[0].contributions.map((contribution, index) => (
+            {apiData.contributions.map((contribution, index) => (
               <Text style={styles.contributionText} key={index}>
                 {contribution.texte_contribution}
               </Text>
             ))}
             <Text style={styles.plumeText}>
               Ecrivains :{" "}
-              {apiData[0].contributions
+              {apiData.contributions
                 .filter(
                   (contribution) => contribution.nom_plume !== "Administrateur"
                 )

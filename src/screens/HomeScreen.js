@@ -22,7 +22,11 @@ const HomeScreen = () => {
         "https://loufok.alwaysdata.net/api/cadavres"
       );
       const data = await response.json();
-      setApiData(data);
+
+      // Assurez-vous que la propriété "cadavres" existe dans la réponse
+      if (data && data.cadavres) {
+        setApiData(data.cadavres);
+      }
     } catch (error) {
       console.error(
         "Erreur lors de la récupération des données de l'API",
@@ -53,12 +57,6 @@ const HomeScreen = () => {
     >
       <View style={styles.header}>
         <Image source={require("../../assets/logo.png")} style={styles.logo} />
-        <TouchableOpacity onPress={() => alert("Icône de question cliquée")}>
-          <Image
-            source={require("../../assets/question.png")}
-            style={styles.questionIcon}
-          />
-        </TouchableOpacity>
       </View>
 
       <View style={styles.container}>
@@ -103,21 +101,22 @@ const HomeScreen = () => {
               )
               .slice(0, 3) // Sélectionne les trois derniers
               .map((cadavre, index) => (
-                <View key={index} style={styles.btnApi}>
-                  <Text style={styles.apiText}>{cadavre.titre_cadavre}</Text>
-                  <TouchableOpacity
-                    onPress={() => {
-                      navigation.navigate("Cadavre", {
-                        id_cadavre: cadavre.id_cadavre,
-                      });
-                    }}
-                  >
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => {
+                    navigation.navigate("Cadavre", {
+                      id_cadavre: cadavre.id_cadavre,
+                    });
+                  }}
+                >
+                  <View style={styles.btnApi}>
+                    <Text style={styles.apiText}>{cadavre.titre_cadavre}</Text>
                     <Image
                       source={require("../../assets/play.png")}
                       style={styles.playLogo}
                     />
-                  </TouchableOpacity>
-                </View>
+                  </View>
+                </TouchableOpacity>
               ))}
           </View>
         )}
