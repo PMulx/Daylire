@@ -113,6 +113,7 @@ const LikeScreen = () => {
     try {
       // Récupérez les IDs actuels du local storage
       const currentLikedCadavres = await AsyncStorage.getItem("likedCadavres");
+      console.log(currentLikedCadavres);
       if (currentLikedCadavres !== null) {
         const parsedCurrentLikedCadavres = JSON.parse(currentLikedCadavres);
         // Retirez l'ID du tableau
@@ -128,16 +129,15 @@ const LikeScreen = () => {
         setLikedCadavresArray(updatedLikedCadavres);
         // Mettez à jour les cadavres affichés
         processLikedCadavres(updatedLikedCadavres);
-        await fetch(
-          `https://loufok.alwaysdata.net/api/cadavre/${id_cadavre}/remove_like`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        await fetch(`https://loufok.alwaysdata.net/api/cadavre/remove_like`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ id: id_cadavre }),
+        });
       }
+      console.log(currentLikedCadavres);
     } catch (error) {
       console.error(
         "Erreur lors de la suppression de l'ID du local storage:",

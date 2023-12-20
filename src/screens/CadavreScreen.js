@@ -70,9 +70,10 @@ const CadavreScreen = ({ route }) => {
         const data = await response.json();
         console.log(data);
         const updatedData = {
-          ...data,
-          nb_jaime: isLiked ? data.nb_jaime - 1 : data.nb_jaime + 1,
+          ...apiData, // Utilisation de apiData au lieu de data
+          nb_jaime: isLiked ? apiData.nb_jaime - 1 : apiData.nb_jaime + 1,
         };
+        console.log(data.nb_jaime);
         // Update liked status in AsyncStorage
         const likedCadavres = await AsyncStorage.getItem("likedCadavres");
         let likedCadavresArray = likedCadavres ? JSON.parse(likedCadavres) : [];
