@@ -180,7 +180,8 @@ const CadavreScreen = ({ route }) => {
               </Text>
             )}
             <Text style={styles.plumeText}>
-              Ecrivains : {apiData?.contributeurs && apiData.contributeurs[0]}
+              Ecrivains :{" "}
+              {apiData?.contributeurs && apiData.contributeurs[0].slice(2)}
               <Text>.</Text>
             </Text>
           </View>
