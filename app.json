@@ -4,12 +4,12 @@
     "slug": "Daylire",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/logo_icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/logo_icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#101A31"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -19,12 +19,18 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
+        "foregroundImage": "./assets/logo_icon.png",
+        "backgroundColor": "#101A31"
+      },
+      "package": "com.mulx.Daylire"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/logo_icon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "f5c5dc95-1a49-4423-a974-0a037eed204c"
+      }
     }
   }
 }
