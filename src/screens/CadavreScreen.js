@@ -1,56 +1,41 @@
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  Text,
-  RefreshControl,
-} from "react-native";
+import React, { useEffect, useState, useRef } from "react";
+import { View, Image, TouchableOpacity, ScrollView, Text } from "react-native";
 import styles from "./../styles/CadavreScreenStyles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const CadavreScreen = ({ route }) => {
+const CadavreScreen = ({ route, navigation }) => {
   const { id_cadavre } = route.params;
   const [apiData, setApiData] = useState(null);
   const [isLiked, setIsLiked] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
+  const navigationRef = useRef(navigation);
 
-  const fetchDataFromApi = async () => {
+  const fetchAndSetData = async () => {
     try {
+      // Récupérer les données de l'API
       const response = await fetch(
         "https://loufok.alwaysdata.net/api/cadavre/" + id_cadavre
       );
       const data = await response.json();
-
       setApiData(data);
+
+      // Récupérer et mettre à jour le statut de like
+      const likedStatus = await AsyncStorage.getItem("likedCadavres");
+      if (likedStatus !== null) {
+        const likedCadavres = JSON.parse(likedStatus);
+        setIsLiked(likedCadavres.includes(id_cadavre));
+      }
     } catch (error) {
-      console.error(
-        "Erreur lors de la récupération des données de l'API",
-        error
-      );
+      console.error("Erreur lors de la récupération des données:", error);
     }
   };
 
   useEffect(() => {
-    const fetchDataAndLikes = async () => {
-      try {
-        await fetchDataFromApi();
+    const unsubscribe = navigationRef.current.addListener("focus", () => {
+      fetchAndSetData();
+    });
 
-        // Vérifiez et mettez à jour le statut de like
-        const likedStatus = await AsyncStorage.getItem("likedCadavres");
-        console.log(likedStatus);
-        if (likedStatus !== null) {
-          const likedCadavres = JSON.parse(likedStatus);
-          setIsLiked(likedCadavres.includes(id_cadavre));
-        }
-      } catch (error) {
-        console.error("Erreur lors du chargement initial:", error);
-      }
-    };
-
-    fetchDataAndLikes(); // Appel de la fonction au chargement initial
-  }, [id_cadavre]);
+    return unsubscribe;
+  }, [navigationRef, id_cadavre]);
 
   const fetchLikeStatus = async () => {
     try {
@@ -130,37 +115,8 @@ const CadavreScreen = ({ route }) => {
     }
   };
 
-  const handleRefresh = async () => {
-    setRefreshing(true);
-    try {
-      await fetchDataFromApi();
-
-      // Mise à jour des données dans AsyncStorage
-      const likedStatus = await AsyncStorage.getItem("likedCadavres");
-      if (likedStatus !== null) {
-        const likedCadavres = JSON.parse(likedStatus);
-        // Mettez à jour les données en fonction des nouvelles données obtenues de l'API
-        const updatedLikedCadavres = likedCadavres.filter(
-          (cadavreId) => cadavreId !== id_cadavre
-        );
-        await AsyncStorage.setItem(
-          "likedCadavres",
-          JSON.stringify(updatedLikedCadavres)
-        );
-      }
-    } finally {
-      setRefreshing(false);
-    }
-  };
-
   return (
-    <ScrollView
-      style={styles.home}
-      stickyHeaderIndices={[1]}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-      }
-    >
+    <ScrollView style={styles.home} stickyHeaderIndices={[1]}>
       {apiData && (
         <>
           <View style={styles.header}>

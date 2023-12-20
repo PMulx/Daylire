@@ -86,18 +86,17 @@ const ListScreen = () => {
   };
 
   useEffect(() => {
-    handleRefresh();
-    fetchDataFromApi();
-  }, []);
+    // Écouter les événements de navigation
+    const unsubscribe = navigation.addListener("focus", () => {
+      // Vérifiez si l'écran actuel est ListScreen
+      if (navigation.isFocused()) {
+        fetchDataFromApi();
+      }
+    });
 
-  const handleRefresh = async () => {
-    setRefreshing(true);
-    try {
-      await fetchDataFromApi();
-    } finally {
-      setRefreshing(false);
-    }
-  };
+    // Nettoyage de l'effet lors du démontage du composant
+    return unsubscribe;
+  }, [navigation]);
 
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "numeric", day: "numeric" };
@@ -147,12 +146,7 @@ const ListScreen = () => {
   };
 
   return (
-    <ScrollView
-      style={styles.home}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-      }
-    >
+    <ScrollView style={styles.home}>
       <View style={styles.header}>
         <Image source={require("../../assets/logo.png")} style={styles.logo} />
       </View>

@@ -113,7 +113,6 @@ const LikeScreen = () => {
     try {
       // Récupérez les IDs actuels du local storage
       const currentLikedCadavres = await AsyncStorage.getItem("likedCadavres");
-      console.log(currentLikedCadavres);
       if (currentLikedCadavres !== null) {
         const parsedCurrentLikedCadavres = JSON.parse(currentLikedCadavres);
         // Retirez l'ID du tableau
@@ -137,7 +136,6 @@ const LikeScreen = () => {
           body: JSON.stringify({ id: id_cadavre }),
         });
       }
-      console.log(currentLikedCadavres);
     } catch (error) {
       console.error(
         "Erreur lors de la suppression de l'ID du local storage:",
