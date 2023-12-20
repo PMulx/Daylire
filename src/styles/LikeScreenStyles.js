@@ -78,8 +78,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   buttonImage: {
+    flex: 1,
     width: 25,
     height: 25,
+    resizeMode: "contain", // Ajuste l'image au conteneur sans déformation
   },
   filter: {
     alignItems: "center",

@@ -142,6 +142,7 @@ const ListScreen = () => {
     }
 
     setSortedCadavres(sortedData);
+    setFilteredCadavres(sortedData); // Mettez à jour filteredCadavres après le tri
   };
 
   return (
@@ -168,8 +169,6 @@ const ListScreen = () => {
         />
         <TouchableOpacity style={styles.buttonStyle} onPress={openModal}>
           <Image
-            width={30}
-            height={30}
             source={require("./../../assets/filter.png")}
             style={styles.buttonImage}
           />
@@ -189,9 +188,9 @@ const ListScreen = () => {
               selectedValue={selectedSort}
               onValueChange={(itemValue) => handleSortChange(itemValue)}
             >
-              <Picker.Item label="Tri alphabétique" value="alphabetical" />
-              <Picker.Item label="nombre de likes" value="likes" />
-              <Picker.Item label="Tri par date" value="date" />
+              <Picker.Item label="Ordre alphabétique" value="alphabetical" />
+              <Picker.Item label="Nombre de likes" value="likes" />
+              <Picker.Item label="Date" value="date" />
             </Picker>
 
             <TouchableOpacity
