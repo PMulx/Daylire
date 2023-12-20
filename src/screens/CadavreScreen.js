@@ -22,7 +22,7 @@ const CadavreScreen = ({ route }) => {
         "https://loufok.alwaysdata.net/api/cadavre/" + id_cadavre
       );
       const data = await response.json();
-      console.log(data);
+
       setApiData(data);
     } catch (error) {
       console.error(
@@ -33,8 +33,23 @@ const CadavreScreen = ({ route }) => {
   };
 
   useEffect(() => {
-    fetchDataFromApi();
-    fetchLikeStatus(); // Appel de fetchLikeStatus à l'intérieur de useEffect
+    const fetchDataAndLikes = async () => {
+      try {
+        await fetchDataFromApi();
+
+        // Vérifiez et mettez à jour le statut de like
+        const likedStatus = await AsyncStorage.getItem("likedCadavres");
+        console.log(likedStatus);
+        if (likedStatus !== null) {
+          const likedCadavres = JSON.parse(likedStatus);
+          setIsLiked(likedCadavres.includes(id_cadavre));
+        }
+      } catch (error) {
+        console.error("Erreur lors du chargement initial:", error);
+      }
+    };
+
+    fetchDataAndLikes(); // Appel de la fonction au chargement initial
   }, [id_cadavre]);
 
   const fetchLikeStatus = async () => {
@@ -48,7 +63,6 @@ const CadavreScreen = ({ route }) => {
       console.error("Erreur lors de la récupération de l'état de like", error);
     }
   };
-  console.log(id_cadavre);
 
   const handleLike = async () => {
     try {
@@ -63,17 +77,13 @@ const CadavreScreen = ({ route }) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ id: id_cadavre }), // Utilisation de la propriété "id" au lieu de "id_cadavre"
+        body: JSON.stringify({ id: id_cadavre }),
       });
 
       if (response.ok) {
         const data = await response.json();
         console.log(data);
-        const updatedData = {
-          ...apiData, // Utilisation de apiData au lieu de data
-          nb_jaime: isLiked ? apiData.nb_jaime - 1 : apiData.nb_jaime + 1,
-        };
-        console.log(data.nb_jaime);
+
         // Update liked status in AsyncStorage
         const likedCadavres = await AsyncStorage.getItem("likedCadavres");
         let likedCadavresArray = likedCadavres ? JSON.parse(likedCadavres) : [];
@@ -90,8 +100,15 @@ const CadavreScreen = ({ route }) => {
           "likedCadavres",
           JSON.stringify(likedCadavresArray)
         );
-        console.log(updatedData);
+
+        // Mettez à jour isLiked après avoir traité la réponse de l'API
         setIsLiked(!isLiked);
+
+        // Mettez à jour nb_jaime en fonction des données de l'API
+        const updatedData = {
+          ...apiData,
+          nb_jaime: isLiked ? apiData.nb_jaime - 1 : apiData.nb_jaime + 1,
+        };
         setApiData(updatedData);
       } else {
         console.error(

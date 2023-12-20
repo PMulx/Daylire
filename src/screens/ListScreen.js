@@ -86,6 +86,7 @@ const ListScreen = () => {
   };
 
   useEffect(() => {
+    handleRefresh();
     fetchDataFromApi();
   }, []);
 
