@@ -113,13 +113,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#FEFFFE",
+    gap: 12,
     borderRadius: 20,
     padding: 10,
     paddingHorizontal: 20,
   },
   apiInfo: {
     flexDirection: "column",
+    gap: 4,
   },
   apiInfoTitle: {
     textTransform: "capitalize",
@@ -134,6 +135,9 @@ const styles = StyleSheet.create({
   apiInfoParticipants: {
     color: "#101A31",
     fontSize: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 20,
     fontWeight: "300",
   },
   titleText: {
@@ -150,9 +154,22 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   btnApi: {
+    marginVertical: 8,
+    gap: 4,
+    alignItems: "center",
+    backgroundColor: "#FEFFFE",
     borderRadius: 20,
-    marginBottom: 10,
-    marginTop: 10,
+  },
+  like: {
+    flexDirection: "row",
+    gap: 2,
+    fontSize: 15,
+    fontWeight: "300",
+    alignItems: "center",
+  },
+  liste: {
+    marginBottom: 50,
+    paddingBottom: 100,
   },
 });
 

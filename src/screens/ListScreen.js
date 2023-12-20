@@ -122,21 +122,6 @@ const ListScreen = () => {
   const closeModal = () => {
     setModalVisible(false);
   };
-  const sortCadavres = (cadavres, sortOption) => {
-    if (sortOption === "alphabetical") {
-      return cadavres
-        .slice()
-        .sort((a, b) => a.titre_cadavre.localeCompare(b.titre_cadavre));
-    } else if (sortOption === "date") {
-      return cadavres
-        .slice()
-        .sort(
-          (a, b) =>
-            new Date(b.date_debut_cadavre) - new Date(a.date_debut_cadavre)
-        );
-    }
-    return cadavres;
-  };
 
   const handleSortChange = (itemValue) => {
     setSelectedSort(itemValue);
@@ -144,15 +129,16 @@ const ListScreen = () => {
     let sortedData;
 
     if (itemValue === "alphabetical") {
-      // Tri alphabétique en fonction du titre du cadavre
       sortedData = apiData.sort((a, b) =>
         a.titre_cadavre.localeCompare(b.titre_cadavre)
       );
     } else if (itemValue === "date") {
-      // Tri par la date de fin du cadavre
       sortedData = apiData.sort(
         (a, b) => new Date(a.date_fin_cadavre) - new Date(b.date_fin_cadavre)
       );
+    } else if (itemValue === "likes") {
+      // Utilisez l'opérateur de soustraction pour trier les nombres
+      sortedData = apiData.sort((a, b) => b.nb_jaime - a.nb_jaime);
     }
 
     setSortedCadavres(sortedData);
@@ -204,6 +190,7 @@ const ListScreen = () => {
               onValueChange={(itemValue) => handleSortChange(itemValue)}
             >
               <Picker.Item label="Tri alphabétique" value="alphabetical" />
+              <Picker.Item label="nombre de likes" value="likes" />
               <Picker.Item label="Tri par date" value="date" />
             </Picker>
 
@@ -216,43 +203,56 @@ const ListScreen = () => {
           </View>
         </View>
       </Modal>
-      {(filteredCadavres || apiData || []).map((data, index) => (
-        <TouchableOpacity
-          style={styles.btnApi}
-          key={index}
-          onPress={() => {
-            navigation.navigate("Cadavre", {
-              id_cadavre: data.id_cadavre,
-            });
-          }}
-        >
-          <View key={index} style={styles.apiDiv}>
-            <View style={styles.apiInfo}>
-              <Text style={styles.apiInfoTitle}>
-                <Text style={styles.titleText}>{data.titre_cadavre}</Text> -{" "}
-                <Text style={styles.participantsText}>
-                  {data.nb_contributions} participants
+      <View style={styles.liste}>
+        {(filteredCadavres || apiData || []).map((data, index) => (
+          <TouchableOpacity
+            style={styles.btnApi}
+            key={index}
+            onPress={() => {
+              navigation.navigate("Cadavre", {
+                id_cadavre: data.id_cadavre,
+              });
+            }}
+          >
+            <View key={index} style={styles.apiDiv}>
+              <View style={styles.apiInfo}>
+                <Text style={styles.titleText}>{data.titre_cadavre}</Text>
+                <View style={styles.apiInfoParticipants}>
+                  <Text style={styles.participantsText}>
+                    {data.nb_contributions} participants
+                  </Text>
+                  <View style={styles.like}>
+                    <Text> {data.nb_jaime} </Text>
+                    <Image
+                      source={require("../../assets/love.png")}
+                      style={styles.playLogo}
+                    />
+                  </View>
+                </View>
+                <Text style={styles.apiInfoPeriode}>
+                  {formatDate(data.date_debut_cadavre)} -{" "}
+                  {formatDate(data.date_fin_cadavre)}
                 </Text>
-              </Text>
-              <Text style={styles.apiInfoPeriode}>
-                {formatDate(data.date_debut_cadavre)} -{" "}
-                {formatDate(data.date_fin_cadavre)}
-              </Text>
-            </View>
-            <View style={styles.percentageCircleContainer}>
-              <PercentageCircleChart
-                percentage={Math.round(
-                  (data.nb_contributions / data.nb_contributions_max) * 100
-                )}
+              </View>
+
+              <View style={styles.like}>
+                <PercentageCircleChart
+                  percentage={Math.round(
+                    (data.nb_contributions / data.nb_contributions_max) * 100
+                  )}
+                />
+              </View>
+
+              <View style={styles.percentageCircleContainer}></View>
+
+              <Image
+                source={require("../../assets/play.png")}
+                style={styles.playLogo}
               />
             </View>
-            <Image
-              source={require("../../assets/play.png")}
-              style={styles.playLogo}
-            />
-          </View>
-        </TouchableOpacity>
-      ))}
+          </TouchableOpacity>
+        ))}
+      </View>
     </ScrollView>
   );
 };
